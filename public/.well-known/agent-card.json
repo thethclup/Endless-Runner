@@ -1,0 +1,42 @@
+{
+  "name": "Endless Runner Orchestrator",
+  "description": "Endless Runner platformunda çalışan ERC-8004 uyumlu AI Agent. Endless running mechanics, obstacle management, score optimization ve continuous automation yapan akıllı orchestrator.",
+  "version": "1.0.0",
+  "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+  "image": "https://endless-runner-iota-pied.vercel.app/logo.png",
+  "wallets": {
+    "base": "0xe157F1F5e12adB38Ba013683E9Ce24efe21e5bA6"
+  },
+  "services": [
+    {
+      "name": "A2A",
+      "endpoint": "https://endless-runner-iota-pied.vercel.app/.well-known/agent-card.json",
+      "version": "1.0.0",
+      "description": "Agent-to-Agent communication"
+    },
+    {
+      "name": "MCP",
+      "endpoint": "https://endless-runner-iota-pied.vercel.app/api/mcp",
+      "version": "1.0.0",
+      "description": "Model Context Protocol - Active command execution"
+    },
+    {
+      "name": "API",
+      "endpoint": "https://endless-runner-iota-pied.vercel.app/api/agent",
+      "version": "1.0.0",
+      "description": "Main agent control API"
+    }
+  ],
+  "capabilities": [
+    "endless-running",
+    "obstacle-management",
+    "score-optimization",
+    "continuous-automation",
+    "survival-strategy",
+    "real-time-control",
+    "mcp-command-execution"
+  ],
+  "supportedChains": ["eip155:8453"],
+  "active": true,
+  "status": "online"
+}
