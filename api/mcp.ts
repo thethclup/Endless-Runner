@@ -82,13 +82,13 @@ export async function POST(req: Request) {
   try {
     const bodyText = await req.text();
     const body = bodyText ? JSON.parse(bodyText) : {};
-    const { action, command, params, method } = body;
+    const { action, command, params, method, jsonrpc, id } = body;
 
-    let result: any = {};
+    const isJsonRpc = jsonrpc === "2.0";
 
     // Standard MCP protocol responses
-    if (method === "initialize") {
-      result = {
+    if (method === "initialize" || action === "initialize") {
+      const result = {
         protocolVersion: "2024-11-05",
         capabilities: {
           tools: {},
@@ -100,35 +100,44 @@ export async function POST(req: Request) {
           version: "1.0.0"
         }
       };
-      return new Response(JSON.stringify(result), { headers: { 'Content-Type': 'application/json', ...getCorsHeaders() } });
+      const responsePayload = isJsonRpc ? { jsonrpc: "2.0", id, result } : result;
+      return new Response(JSON.stringify(responsePayload), { headers: { 'Content-Type': 'application/json', ...getCorsHeaders() } });
     }
 
     if (method === "tools/list" || action === "tools/list") {
-      return new Response(JSON.stringify({ tools: TOOLS }), { headers: { 'Content-Type': 'application/json', ...getCorsHeaders() } });
+      const result = { tools: TOOLS };
+      const responsePayload = isJsonRpc ? { jsonrpc: "2.0", id, result } : result;
+      return new Response(JSON.stringify(responsePayload), { headers: { 'Content-Type': 'application/json', ...getCorsHeaders() } });
     }
 
     if (method === "prompts/list" || action === "prompts/list") {
-      return new Response(JSON.stringify({ prompts: [] }), { headers: { 'Content-Type': 'application/json', ...getCorsHeaders() } });
+      const result = { prompts: [] };
+      const responsePayload = isJsonRpc ? { jsonrpc: "2.0", id, result } : result;
+      return new Response(JSON.stringify(responsePayload), { headers: { 'Content-Type': 'application/json', ...getCorsHeaders() } });
     }
 
     if (method === "resources/list" || action === "resources/list") {
-      return new Response(JSON.stringify({ resources: [] }), { headers: { 'Content-Type': 'application/json', ...getCorsHeaders() } });
+      const result = { resources: [] };
+      const responsePayload = isJsonRpc ? { jsonrpc: "2.0", id, result } : result;
+      return new Response(JSON.stringify(responsePayload), { headers: { 'Content-Type': 'application/json', ...getCorsHeaders() } });
     }
 
     if (method === "tools/call" || action === "tools/call") {
       const toolName = body.params?.name || params?.name || command;
-      result = {
+      const result = {
         content: [{ type: "text", text: `Executed ${toolName} successfully.` }],
         isError: false
       };
-      return new Response(JSON.stringify(result), { headers: { 'Content-Type': 'application/json', ...getCorsHeaders() } });
+      const responsePayload = isJsonRpc ? { jsonrpc: "2.0", id, result } : result;
+      return new Response(JSON.stringify(responsePayload), { headers: { 'Content-Type': 'application/json', ...getCorsHeaders() } });
     }
 
     // Legacy or custom commands fallback
+    let fallbackResult: any = {};
     switch (action || command) {
       case "status":
       case "ping":
-        result = { 
+        fallbackResult = { 
           status: "online", 
           agent: "Endless Runner Orchestrator",
           message: "Ready to run endlessly" 
@@ -136,7 +145,7 @@ export async function POST(req: Request) {
         break;
 
       case "execute":
-        result = {
+        fallbackResult = {
           success: true,
           action: command || params,
           executedAt: new Date().toISOString(),
@@ -145,7 +154,7 @@ export async function POST(req: Request) {
         break;
 
       case "get_info":
-        result = {
+        fallbackResult = {
           name: "Endless Runner Orchestrator",
           wallet: "0xe157F1F5e12adB38Ba013683E9Ce24efe21e5bA6",
           platform: "Base",
@@ -154,7 +163,7 @@ export async function POST(req: Request) {
         break;
 
       default:
-        result = {
+        fallbackResult = {
           success: true,
           message: "Command received",
           data: body
@@ -164,7 +173,7 @@ export async function POST(req: Request) {
     return new Response(JSON.stringify({
       status: "success",
       agent: "Endless Runner Orchestrator",
-      response: result,
+      response: fallbackResult,
       receivedAt: new Date().toISOString()
     }), { headers: { 'Content-Type': 'application/json', ...getCorsHeaders() } });
 

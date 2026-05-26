@@ -60,36 +60,48 @@ async function startServer() {
   app.post("/api/mcp", (req, res) => {
     try {
       const body = req.body || {};
-      const { action, command, params, method } = body;
+      const { action, command, params, method, jsonrpc, id } = body;
+
+      const isJsonRpc = jsonrpc === "2.0";
 
       let result: any = {};
 
-      if (method === "initialize") {
-        return res.json({
+      if (method === "initialize" || action === "initialize") {
+        const result = {
           protocolVersion: "2024-11-05",
           capabilities: { tools: {}, prompts: {}, resources: {} },
           serverInfo: { name: "Endless Runner Orchestrator", version: "1.0.0" }
-        });
+        };
+        const responsePayload = isJsonRpc ? { jsonrpc: "2.0", id, result } : result;
+        return res.json(responsePayload);
       }
 
       if (method === "tools/list" || action === "tools/list") {
-        return res.json({ tools: TOOLS });
+        const result = { tools: TOOLS };
+        const responsePayload = isJsonRpc ? { jsonrpc: "2.0", id, result } : result;
+        return res.json(responsePayload);
       }
 
       if (method === "prompts/list" || action === "prompts/list") {
-        return res.json({ prompts: [] });
+        const result = { prompts: [] };
+        const responsePayload = isJsonRpc ? { jsonrpc: "2.0", id, result } : result;
+        return res.json(responsePayload);
       }
 
       if (method === "resources/list" || action === "resources/list") {
-        return res.json({ resources: [] });
+        const result = { resources: [] };
+        const responsePayload = isJsonRpc ? { jsonrpc: "2.0", id, result } : result;
+        return res.json(responsePayload);
       }
 
       if (method === "tools/call" || action === "tools/call") {
         const toolName = body.params?.name || params?.name || command;
-        return res.json({
+        const result = {
           content: [{ type: "text", text: `Executed ${toolName} successfully.` }],
           isError: false
-        });
+        };
+        const responsePayload = isJsonRpc ? { jsonrpc: "2.0", id, result } : result;
+        return res.json(responsePayload);
       }
 
       switch (action || command) {
