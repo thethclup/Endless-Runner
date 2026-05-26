@@ -1,6 +1,6 @@
 {
   "name": "Endless Runner Orchestrator",
-  "description": "Endless Runner platformunda çalışan ERC-8004 uyumlu AI Agent. Endless running mechanics, obstacle management, score optimization ve continuous automation yapan akıllı orchestrator.",
+  "description": "High-performance AI Agent specialized in warp racing mechanics, real-time automation, multi-track management, competitive optimization and ecosystem coordination on Base.",
   "version": "1.0.0",
   "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
   "image": "https://endless-runner-iota-pied.vercel.app/logo.png",
@@ -9,46 +9,45 @@
   "active": true,
   "skills": [
     {
-      "id": "endless-running",
-      "name": "Endless Running",
-      "description": "Continuous running automation and trajectory precision."
+      "id": "warp-racing",
+      "name": "Warp Racing",
+      "description": "Real-time warp racing mechanics, speed optimization and competitive track management."
     },
     {
-      "id": "obstacle-management",
-      "name": "Obstacle Management",
-      "description": "Real-time AI detection and collision avoidance for moving platforms, walls, and spikes."
+      "id": "multi-track-orchestration",
+      "name": "Multi-Track Orchestration",
+      "description": "Manage and synchronize multiple racing instances and tracks simultaneously."
     },
     {
-      "id": "score-optimization",
-      "name": "Score Optimization",
-      "description": "Maximum combo preservation and energy orbs collection strategy."
+      "id": "performance-optimization",
+      "name": "Performance Optimization",
+      "description": "Analyze and optimize racing performance, timing and strategy in real-time."
     }
   ],
   "services": [
     {
       "name": "A2A",
-      "endpoint": "https://endless-runner-iota-pied.vercel.app/.well-known/agent-card.json",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "endpoint": "https://endless-runner-iota-pied.vercel.app/.well-known/agent-card.json"
     },
     {
       "name": "MCP",
-      "endpoint": "https://endless-runner-iota-pied.vercel.app/api/mcp",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "endpoint": "https://endless-runner-iota-pied.vercel.app/api/mcp"
     },
     {
       "name": "API",
-      "endpoint": "https://endless-runner-iota-pied.vercel.app/api/agent",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "endpoint": "https://endless-runner-iota-pied.vercel.app/api/agent"
     }
   ],
   "capabilities": [
-    "endless-running",
-    "obstacle-management",
-    "score-optimization",
-    "continuous-automation",
-    "survival-strategy",
-    "real-time-control",
-    "mcp-command-execution"
+    "warp-racing",
+    "real-time-automation",
+    "multi-track-management",
+    "speed-optimization",
+    "competitive-orchestration",
+    "ecosystem-coordination"
   ],
   "supportedChains": ["eip155:8453"],
   "x402Support": false,

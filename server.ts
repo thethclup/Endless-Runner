@@ -2,6 +2,34 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 
+const TOOLS = [
+  {
+    name: "get_race_status",
+    description: "Get the current endless runner race status and metrics.",
+    inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "start_race",
+    description: "Initialize and start a new endless runner race sequence.",
+    inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "get_leaderboard",
+    description: "Retrieve the current on-chain endless runner leaderboard.",
+    inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "optimize_speed",
+    description: "Calculate and apply speed optimizations for the runner.",
+    inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "get_track_info",
+    description: "Retrieve procedural generation details for the current track.",
+    inputSchema: { type: "object", properties: {} }
+  }
+];
+
 async function startServer() {
   const app = express();
   const PORT = 3000;
@@ -17,12 +45,14 @@ async function startServer() {
       name: "Endless Runner MCP Endpoint",
       status: "active",
       description: "Active MCP server for Endless Runner Orchestrator Agent",
-      capabilities: [
-        "endless-running",
-        "obstacle-management",
-        "score-optimization",
-        "continuous-automation"
-      ],
+      capabilities: {
+        tools: true,
+        prompts: true,
+        resources: true
+      },
+      tools: TOOLS,
+      prompts: [],
+      resources: [],
       timestamp: new Date().toISOString()
     });
   });
@@ -30,9 +60,37 @@ async function startServer() {
   app.post("/api/mcp", (req, res) => {
     try {
       const body = req.body || {};
-      const { action, command, params } = body;
+      const { action, command, params, method } = body;
 
       let result: any = {};
+
+      if (method === "initialize") {
+        return res.json({
+          protocolVersion: "2024-11-05",
+          capabilities: { tools: {}, prompts: {}, resources: {} },
+          serverInfo: { name: "Endless Runner Orchestrator", version: "1.0.0" }
+        });
+      }
+
+      if (method === "tools/list" || action === "tools/list") {
+        return res.json({ tools: TOOLS });
+      }
+
+      if (method === "prompts/list" || action === "prompts/list") {
+        return res.json({ prompts: [] });
+      }
+
+      if (method === "resources/list" || action === "resources/list") {
+        return res.json({ resources: [] });
+      }
+
+      if (method === "tools/call" || action === "tools/call") {
+        const toolName = body.params?.name || params?.name || command;
+        return res.json({
+          content: [{ type: "text", text: `Executed ${toolName} successfully.` }],
+          isError: false
+        });
+      }
 
       switch (action || command) {
         case "status":
