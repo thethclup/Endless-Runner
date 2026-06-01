@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { ScoreData } from '../types';
 import { useAccount } from 'wagmi';
-import { useOnchainScore } from '../hooks/useOnchainScore';
+import { ScoreSubmitButton } from './erc8021/ScoreSubmitButton';
 
 interface GameOverScreenProps {
   score: ScoreData;
@@ -13,18 +13,8 @@ interface GameOverScreenProps {
 
 export default function GameOverScreen({ score, highScore, onRestart, onQuit }: GameOverScreenProps) {
   const { isConnected } = useAccount();
-  const { submitScore, isSubmitting } = useOnchainScore();
-  const [submitted, setSubmitted] = useState(false);
 
   const isNewHighScore = score.score > highScore && score.score > 0;
-
-  const handleRecordScore = async () => {
-    if (!isConnected) return;
-    const success = await submitScore(score.score, score.distance);
-    if (success) {
-      setSubmitted(true);
-    }
-  };
 
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-xl p-6 z-50">
@@ -62,17 +52,7 @@ export default function GameOverScreen({ score, highScore, onRestart, onQuit }: 
             Run Again
           </button>
           
-          <button
-            onClick={handleRecordScore}
-            disabled={!isConnected || submitted}
-            className={`w-full py-4 font-bold rounded-2xl uppercase tracking-widest transition-all cyber-btn ${
-              !isConnected ? 'glass text-slate-500 cursor-not-allowed' :
-              submitted ? 'bg-green-600/50 text-white cursor-default border-green-500' :
-              'glass hover:bg-white/10 text-white'
-            }`}
-          >
-            {!isConnected ? 'Wallet Not Connected' : submitted ? 'Recorded On-Chain!' : 'Record Score On-Chain'}
-          </button>
+          <ScoreSubmitButton score={Math.floor(score.score)} distance={Math.floor(score.distance)} />
 
           <button
             onClick={onQuit}

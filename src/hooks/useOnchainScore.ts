@@ -1,27 +1,50 @@
 import { useState } from 'react';
-import { useAccount, useSignMessage } from 'wagmi';
+import { useAccount } from 'wagmi';
+import { encodeFunctionData } from 'viem';
+import { useERC8021Transaction } from '../lib/erc8021/hooks/useERC8021Transaction';
+
+const SCORE_CONTRACT_PLACEHOLDER = "0x0000000000000000000000000000000000000000";
+
+const SCORE_ABI = [{
+    "inputs": [
+        { "internalType": "uint256", "name": "score", "type": "uint256" },
+        { "internalType": "uint256", "name": "distance", "type": "uint256" }
+    ],
+    "name": "submitScore",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+}] as const;
 
 export function useOnchainScore() {
     const { address, isConnected } = useAccount();
-    const { signMessageAsync } = useSignMessage();
+    const { sendTransaction } = useERC8021Transaction();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [txHash, setTxHash] = useState<string | null>(null);
 
     const submitScore = async (score: number, distance: number) => {
         if (!isConnected || !address) return false;
 
         try {
             setIsSubmitting(true);
-            const message = `Sign this message to record your score on-chain!
-App: Endless Runner Dash
-Address: ${address}
-Score: ${score}
-Distance: ${distance}
-Nonce: ${Date.now()}`;
+            setTxHash(null);
             
-            // This is standard SIWE execution. Submitting to backend or registry could integrate ERC-8021 suffixes at the contract level for recording.
-            const signature = await signMessageAsync({ account: address as `0x${string}`, message });
-            console.log("Recorded score via SIWE:", signature);
-            return true;
+            // Encode function call to store score on chain
+            const data = encodeFunctionData({
+                abi: SCORE_ABI,
+                functionName: 'submitScore',
+                args: [BigInt(Math.floor(score)), BigInt(Math.floor(distance))]
+            });
+
+            // Use the Hook that automatically adds the ERC8021 Suffix
+            const hash = await sendTransaction({
+                to: SCORE_CONTRACT_PLACEHOLDER,
+                data: data
+            }, "[ATTRIBUTION_CODE]", "bc_1aw46v36");
+            
+            console.log("Recorded score on-chain with tx:", hash);
+            setTxHash(hash);
+            return hash;
         } catch (error) {
             console.error("Score submission failed:", error);
             return false;
@@ -30,5 +53,5 @@ Nonce: ${Date.now()}`;
         }
     };
 
-    return { submitScore, isSubmitting };
+    return { submitScore, isSubmitting, txHash };
 }
