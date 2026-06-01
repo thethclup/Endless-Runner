@@ -1,5 +1,7 @@
 import { motion } from 'motion/react';
-import { useWeb3 } from '../hooks/useWeb3';
+import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import { injected } from 'wagmi/connectors';
+import { useERC8021Transaction } from '../lib/erc8021/hooks/useERC8021Transaction';
 
 interface TitleScreenProps {
   onStart: () => void;
@@ -7,7 +9,23 @@ interface TitleScreenProps {
 }
 
 export default function TitleScreen({ onStart, highScore }: TitleScreenProps) {
-  const { address, isConnected, login, logout, sayGM } = useWeb3();
+  const { address, isConnected } = useAccount();
+  const { connect } = useConnect();
+  const { disconnect } = useDisconnect();
+  const { sendTransaction, isPending } = useERC8021Transaction();
+
+  const handleSayGM = async () => {
+     if (!isConnected || !address) return;
+     try {
+         await sendTransaction({
+             to: address,
+             value: 0n,
+             data: '0x474d' // "GM"
+         });
+     } catch (e) {
+         console.error(e);
+     }
+  };
 
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
@@ -49,7 +67,7 @@ export default function TitleScreen({ onStart, highScore }: TitleScreenProps) {
 
           <div className="glass p-4 flex flex-col items-center gap-3">
             {!isConnected ? (
-              <button onClick={login} className="w-full py-3 glass hover:bg-white/10 cyber-btn transition-colors text-sm font-bold tracking-widest uppercase">
+              <button onClick={() => connect({ connector: injected() })} className="w-full py-3 glass hover:bg-white/10 cyber-btn transition-colors text-sm font-bold tracking-widest uppercase">
                 Connect Wallet (Base)
               </button>
             ) : (
@@ -58,10 +76,10 @@ export default function TitleScreen({ onStart, highScore }: TitleScreenProps) {
                        {address?.substring(0,6)}...{address?.substring(address.length - 4)}
                    </p>
                    <div className="flex gap-2">
-                     <button onClick={sayGM} className="flex-1 py-3 glass hover:bg-white/10 cyber-btn transition-colors text-[10px] sm:text-xs font-bold tracking-widest uppercase">
+                     <button onClick={handleSayGM} disabled={isPending} className="flex-1 py-3 glass hover:bg-white/10 cyber-btn transition-colors text-[10px] sm:text-xs font-bold tracking-widest uppercase disabled:opacity-50">
                         Say GM
                      </button>
-                     <button onClick={logout} className="flex-1 py-3 glass hover:bg-white/10 cyber-btn transition-colors text-[10px] sm:text-xs font-bold tracking-widest uppercase">
+                     <button onClick={() => disconnect()} className="flex-1 py-3 glass hover:bg-white/10 cyber-btn transition-colors text-[10px] sm:text-xs font-bold tracking-widest uppercase">
                         Disconnect
                      </button>
                    </div>

@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import { motion } from 'motion/react';
 import { ScoreData } from '../types';
-import { useWeb3 } from '../hooks/useWeb3';
-import { useState } from 'react';
+import { useAccount } from 'wagmi';
+import { useOnchainScore } from '../hooks/useOnchainScore';
 
 interface GameOverScreenProps {
   score: ScoreData;
@@ -11,14 +12,15 @@ interface GameOverScreenProps {
 }
 
 export default function GameOverScreen({ score, highScore, onRestart, onQuit }: GameOverScreenProps) {
-  const { isConnected, submitScoreSiwe } = useWeb3();
+  const { isConnected } = useAccount();
+  const { submitScore, isSubmitting } = useOnchainScore();
   const [submitted, setSubmitted] = useState(false);
 
   const isNewHighScore = score.score > highScore && score.score > 0;
 
   const handleRecordScore = async () => {
     if (!isConnected) return;
-    const success = await submitScoreSiwe(score.score, score.distance);
+    const success = await submitScore(score.score, score.distance);
     if (success) {
       setSubmitted(true);
     }

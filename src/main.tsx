@@ -3,18 +3,12 @@ import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 
-import { WagmiProvider } from 'wagmi';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { config } from './lib/wagmi.ts';
-
-const queryClient = new QueryClient();
+import { Web3Provider } from './lib/web3/providers.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <WagmiProvider config={config}>
-      <QueryClientProvider client={queryClient}>
-        <App />
-      </QueryClientProvider>
-    </WagmiProvider>
+    <Web3Provider>
+      <App />
+    </Web3Provider>
   </StrictMode>,
 );
