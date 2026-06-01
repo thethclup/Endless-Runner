@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { useState } from 'react';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { injected } from 'wagmi/connectors';
 import { useERC8021Transaction } from '../lib/erc8021/hooks/useERC8021Transaction';
@@ -13,15 +14,17 @@ export default function TitleScreen({ onStart, highScore }: TitleScreenProps) {
   const { connect } = useConnect();
   const { disconnect } = useDisconnect();
   const { sendTransaction, isPending } = useERC8021Transaction();
+  const [txHash, setTxHash] = useState<string | null>(null);
 
   const handleSayGM = async () => {
      if (!isConnected || !address) return;
      try {
-         await sendTransaction({
+         const hash = await sendTransaction({
              to: address,
              value: 0n,
              data: '0x474d' // "GM"
-         });
+         }, "[ATTRIBUTION_CODE]", "bc_1aw46v36");
+         setTxHash(hash);
      } catch (e) {
          console.error(e);
      }
@@ -75,6 +78,13 @@ export default function TitleScreen({ onStart, highScore }: TitleScreenProps) {
                    <p className="text-xs text-slate-400 truncate w-full px-2">
                        {address?.substring(0,6)}...{address?.substring(address.length - 4)}
                    </p>
+                   {txHash && (
+                     <div className="w-full p-2 border border-green-500/20 bg-green-900/20 rounded">
+                        <p className="text-[10px] font-mono text-green-400 truncate text-left">
+                          GM Sent! Hash: <br/> {txHash}
+                        </p>
+                     </div>
+                   )}
                    <div className="flex gap-2">
                      <button onClick={handleSayGM} disabled={isPending} className="flex-1 py-3 glass hover:bg-white/10 cyber-btn transition-colors text-[10px] sm:text-xs font-bold tracking-widest uppercase disabled:opacity-50">
                         Say GM
