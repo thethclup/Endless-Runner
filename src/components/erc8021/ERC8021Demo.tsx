@@ -1,16 +1,23 @@
 import React, { useState } from 'react';
 import { useERC8021Transaction } from '../../lib/erc8021/hooks/useERC8021Transaction';
-import { useAccount } from 'wagmi';
+import { useAccount, useSwitchChain } from 'wagmi';
+import { base } from 'wagmi/chains';
 
 export function ERC8021Demo() {
-    const { isConnected, address } = useAccount();
+    const { isConnected, address, chainId } = useAccount();
+    const { switchChainAsync } = useSwitchChain();
     const { sendTransaction, isPending } = useERC8021Transaction();
     const [txHash, setTxHash] = useState<string>('');
+    const [error, setError] = useState<string | null>(null);
 
     const handleSendAttributedTx = async () => {
         if (!isConnected || !address) return alert("Connect wallet first!");
+        setError(null);
         
         try {
+            if (chainId !== base.id) {
+                await switchChainAsync({ chainId: base.id });
+            }
             // Self-transfer 0 ETH to demonstrate calldata attribution
             const tx = await sendTransaction({
                 to: address,
@@ -18,8 +25,9 @@ export function ERC8021Demo() {
                 data: '0x' 
             });
             setTxHash(tx);
-        } catch (error) {
-            console.error("Transaction Error:", error);
+        } catch (err: any) {
+            console.error("Transaction Error:", err);
+            setError(err?.shortMessage ?? err?.message ?? 'Transaction failed');
         }
     };
 
@@ -41,6 +49,7 @@ export function ERC8021Demo() {
             >
                 {isPending ? 'Sending...' : 'Test Attribution Payload'}
             </button>
+            {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
         </div>
     );
 }

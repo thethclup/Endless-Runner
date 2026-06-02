@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { GameState, ScoreData } from './types';
 import TitleScreen from './components/TitleScreen';
 import GameScreen from './components/GameScreen';

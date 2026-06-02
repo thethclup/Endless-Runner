@@ -1,32 +1,15 @@
-// This represents a batched transaction dispatcher with ERC-8021 support.
-// Actual implementations often use Account Abstraction (ERC-4337) or multicall.
-import { appendERC8021Calldata } from '../utils';
-import { ATTRIBUTION_CODE_PLACEHOLDER, BUILDER_CODE_PLACEHOLDER } from '../constants';
-
+/**
+ * useERC8021BatchTransaction — NOT IMPLEMENTED (stub only).
+ * Real batch sending requires Multicall3 or an ERC-4337 bundler.
+ * Do NOT use in production until properly implemented.
+ */
 export function useERC8021BatchTransaction() {
-    
-    const sendBatchWithAttribution = async (
-        transactions: any[], 
-        attributionCode = ATTRIBUTION_CODE_PLACEHOLDER, 
-        builderCode = BUILDER_CODE_PLACEHOLDER
-    ) => {
-        // Multi-call packing or batch packing logic goes here.
-        // For now, we mock returning packed calldata.
-        
-        console.log("Preparing batch transactions:", transactions.length);
-        
-        const combinedData = `0xBATCHDATA`;
-        const finalData = appendERC8021Calldata(combinedData as `0x${string}`, {
-            schema: 0,
-            attributionCode,
-            builderCode
-        });
-
-        console.log("Sending batch with attribution...", finalData);
-        return "0xBATCH_TX_HASH";
-    };
-
-    return {
-        sendBatch: sendBatchWithAttribution
-    };
+  const sendBatch = async (_transactions: unknown[]): Promise<never> => {
+    throw new Error(
+      'useERC8021BatchTransaction is not implemented. ' +
+      'Wire up Multicall3 (0xcA11bde05977b3631167028862bE2a173976CA11) ' +
+      'or an ERC-4337 bundler before using this hook.'
+    );
+  };
+  return { sendBatch };
 }

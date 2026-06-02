@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAccount, useSwitchChain } from 'wagmi';
 import { base } from 'wagmi/chains';
 import { useERC8021Transaction } from '../../lib/erc8021/hooks/useERC8021Transaction';
+import { ATTRIBUTION_CODE, BUILDER_CODE } from '../../lib/erc8021/constants';
 import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle2, ExternalLink, X } from 'lucide-react';
 
@@ -22,7 +23,7 @@ export function SayGMButton() {
                 to: address,
                 value: 0n, // 0 ETH self-transfer
                 data: '0x474d' // "GM" in hex
-            }, "[ATTRIBUTION_CODE]", "bc_1aw46v36");
+            }, ATTRIBUTION_CODE, BUILDER_CODE);
             
             setTxHash(hash);
             setShowModal(true);

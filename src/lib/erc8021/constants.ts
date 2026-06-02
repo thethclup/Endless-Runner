@@ -1,3 +1,7 @@
+// Replace the empty string below with your real attribution code from base.dev Settings
+export const ATTRIBUTION_CODE = import.meta.env.VITE_ATTRIBUTION_CODE ?? '';
+export const BUILDER_CODE = import.meta.env.VITE_BUILDER_CODE ?? 'bc_1aw46v36';
+// Keep old placeholder export for validation logic only:
 export const ATTRIBUTION_CODE_PLACEHOLDER = "[ATTRIBUTION_CODE]";
 export const BUILDER_CODE_PLACEHOLDER = "bc_1aw46v36";
 

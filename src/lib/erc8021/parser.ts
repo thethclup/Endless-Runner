@@ -38,7 +38,8 @@ export function parseERC8021Calldata(calldata: string): ParsedAttribution {
         const codesAscii = hexToString(codesHex);
         const codes = codesAscii.split(',');
         
-        const rawSuffix = cleanCalldata.slice(-36 - (codesLen * 2));
+        const suffixHexLen = (codesLen * 2) + 36;
+        const rawSuffix = cleanCalldata.slice(cleanCalldata.length - suffixHexLen);
         
         return {
             hasSuffix: true,

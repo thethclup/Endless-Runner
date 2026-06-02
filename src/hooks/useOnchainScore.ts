@@ -3,6 +3,7 @@ import { useAccount, useSwitchChain } from 'wagmi';
 import { encodeFunctionData } from 'viem';
 import { base } from 'wagmi/chains';
 import { useERC8021Transaction } from '../lib/erc8021/hooks/useERC8021Transaction';
+import { ATTRIBUTION_CODE, BUILDER_CODE } from '../lib/erc8021/constants';
 
 const SCORE_CONTRACT_PLACEHOLDER = '0x0000000000000000000000000000000000000000';
 const SCORE_ABI = [{
@@ -33,7 +34,7 @@ export function useOnchainScore() {
       });
       const hash = await sendTransaction(
         { to: SCORE_CONTRACT_PLACEHOLDER as `0x${string}`, data },
-        '[ATTRIBUTION_CODE]', 'bc_1aw46v36',
+        ATTRIBUTION_CODE, BUILDER_CODE,
       );
       setTxHash(hash);
       return hash;

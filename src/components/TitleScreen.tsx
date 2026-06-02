@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
-import { injected } from 'wagmi/connectors';
 import { SayGMButton } from './erc8021/SayGMButton';
+import { ATTRIBUTION_CODE, BUILDER_CODE } from '../lib/erc8021/constants';
 
 interface TitleScreenProps {
   onStart: () => void;
@@ -10,7 +10,7 @@ interface TitleScreenProps {
 
 export default function TitleScreen({ onStart, highScore }: TitleScreenProps) {
   const { address, isConnected } = useAccount();
-  const { connect } = useConnect();
+  const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
 
   return (
@@ -53,7 +53,10 @@ export default function TitleScreen({ onStart, highScore }: TitleScreenProps) {
 
           <div className="glass p-4 flex flex-col items-center gap-3">
             {!isConnected ? (
-              <button onClick={() => connect({ connector: injected() })} className="w-full py-3 glass hover:bg-white/10 cyber-btn transition-colors text-sm font-bold tracking-widest uppercase">
+              <button onClick={() => {
+                const injectedConnector = connectors.find(c => c.type === 'injected') ?? connectors[0];
+                connect({ connector: injectedConnector });
+              }} className="w-full py-3 glass hover:bg-white/10 cyber-btn transition-colors text-sm font-bold tracking-widest uppercase">
                 Connect Wallet (Base)
               </button>
             ) : (
@@ -75,7 +78,7 @@ export default function TitleScreen({ onStart, highScore }: TitleScreenProps) {
       
       <div className="absolute bottom-6 text-slate-500 font-mono text-[10px] tracking-widest pointer-events-none flex flex-col items-center gap-1">
         <span>PROT: ERC-8021</span>
-        <span>ATTRIBUTION: [ATTRIBUTION_CODE] | BUILDER: bc_1aw46v36</span>
+        <span>ATTRIBUTION: {ATTRIBUTION_CODE || '[ATTRIBUTION_CODE]'} | BUILDER: {BUILDER_CODE}</span>
       </div>
     </div>
   );
