@@ -14,17 +14,22 @@ function stringToHex(str: string): string {
 
 /**
  * Generates an ERC-8021 compliant suffix (Schema 0).
- * Format generally involves magic bytes, schema id, and the packed identifiers.
  */
 export function generateERC8021Suffix(config: ERC8021Config): string {
-    const schemaHex = SCHEMA_ID_0; 
+    const schemaHex = config.schema === 1 ? "01" : config.schema === 2 ? "02" : SCHEMA_ID_0; 
     
-    // Convert codes to hex
-    const attrHex = stringToHex(config.attributionCode);
-    const builderHex = config.builderCode ? stringToHex(config.builderCode) : "";
+    const codes = [];
+    if (config.attributionCode) codes.push(config.attributionCode);
+    if (config.builderCode) codes.push(config.builderCode);
     
-    // Build suffix (simplified Schema 0)
-    const suffix = `${ERC8021_MAGIC_BYTES}${schemaHex}${attrHex}${builderHex}`;
+    const codesString = codes.join(",");
+    const codesHex = stringToHex(codesString);
+    
+    // codesLength is the byte length of the string
+    const codesLengthHex = codesString.length.toString(16).padStart(2, "0");
+    
+    // codes + codesLength(1) + schemaId(1) + ercMarker(16)
+    const suffix = `${codesHex}${codesLengthHex}${schemaHex}${ERC8021_MAGIC_BYTES}`;
     
     return suffix;
 }
@@ -34,5 +39,7 @@ export function generateERC8021Suffix(config: ERC8021Config): string {
  */
 export function appendERC8021Calldata(baseCalldata: `0x${string}`, config: ERC8021Config): `0x${string}` {
     const suffix = generateERC8021Suffix(config);
-    return `${baseCalldata}${suffix}` as `0x${string}`;
+    // ensure baseCalldata has 0x prefix if needed
+    const cleanBase = baseCalldata.startsWith("0x") ? baseCalldata : `0x${baseCalldata}`;
+    return `${cleanBase}${suffix}` as `0x${string}`;
 }

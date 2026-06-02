@@ -7,8 +7,7 @@ const SCORE_CONTRACT_PLACEHOLDER = "0x0000000000000000000000000000000000000000";
 
 const SCORE_ABI = [{
     "inputs": [
-        { "internalType": "uint256", "name": "score", "type": "uint256" },
-        { "internalType": "uint256", "name": "distance", "type": "uint256" }
+        { "internalType": "uint256", "name": "score", "type": "uint256" }
     ],
     "name": "submitScore",
     "outputs": [],
@@ -22,7 +21,7 @@ export function useOnchainScore() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [txHash, setTxHash] = useState<string | null>(null);
 
-    const submitScore = async (score: number, distance: number) => {
+    const submitScore = async (score: number) => {
         if (!isConnected || !address) return false;
 
         try {
@@ -33,7 +32,7 @@ export function useOnchainScore() {
             const data = encodeFunctionData({
                 abi: SCORE_ABI,
                 functionName: 'submitScore',
-                args: [BigInt(Math.floor(score)), BigInt(Math.floor(distance))]
+                args: [BigInt(Math.floor(score))]
             });
 
             // Use the Hook that automatically adds the ERC8021 Suffix

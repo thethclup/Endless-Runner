@@ -6,17 +6,16 @@ import { ShieldCheck, ExternalLink, X } from 'lucide-react';
 
 interface ScoreSubmitButtonProps {
     score: number;
-    distance: number;
 }
 
-export function ScoreSubmitButton({ score, distance }: ScoreSubmitButtonProps) {
+export function ScoreSubmitButton({ score }: ScoreSubmitButtonProps) {
     const { isConnected } = useAccount();
     const { submitScore, isSubmitting, txHash } = useOnchainScore();
     const [showModal, setShowModal] = useState(false);
 
     const handleRecordScore = async () => {
         if (!isConnected) return;
-        const hash = await submitScore(score, distance);
+        const hash = await submitScore(score);
         if (hash) {
             setShowModal(true);
         }

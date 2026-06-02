@@ -52,7 +52,7 @@ export default function GameOverScreen({ score, highScore, onRestart, onQuit }: 
             Run Again
           </button>
           
-          <ScoreSubmitButton score={Math.floor(score.score)} distance={Math.floor(score.distance)} />
+          <ScoreSubmitButton score={Math.floor(score.score)} />
 
           <button
             onClick={onQuit}
