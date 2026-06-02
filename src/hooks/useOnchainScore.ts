@@ -5,7 +5,7 @@ import { base } from 'wagmi/chains';
 import { useERC8021Transaction } from '../lib/erc8021/hooks/useERC8021Transaction';
 import { ATTRIBUTION_CODE, BUILDER_CODE } from '../lib/erc8021/constants';
 
-const SCORE_CONTRACT_PLACEHOLDER = '0x0000000000000000000000000000000000000000';
+const SCORE_CONTRACT_PLACEHOLDER = '0x000000000000000000000000000000000000dEaD';
 const SCORE_ABI = [{
   inputs: [{ internalType: 'uint256', name: 'score', type: 'uint256' }],
   name: 'submitScore', outputs: [], stateMutability: 'nonpayable', type: 'function',

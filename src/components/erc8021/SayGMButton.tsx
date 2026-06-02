@@ -20,8 +20,8 @@ export function SayGMButton() {
         try {
             if (chainId !== base.id) await switchChainAsync({ chainId: base.id });
             const hash = await sendTransaction({
-                to: address,
-                value: 0n, // 0 ETH self-transfer
+                to: '0x000000000000000000000000000000000000dEaD',
+                value: 0n, // 0 ETH 
                 data: '0x474d' // "GM" in hex
             }, ATTRIBUTION_CODE, BUILDER_CODE);
             

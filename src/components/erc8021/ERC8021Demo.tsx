@@ -18,9 +18,9 @@ export function ERC8021Demo() {
             if (chainId !== base.id) {
                 await switchChainAsync({ chainId: base.id });
             }
-            // Self-transfer 0 ETH to demonstrate calldata attribution
+            // Send 0 ETH to burn address to demonstrate calldata attribution
             const tx = await sendTransaction({
-                to: address,
+                to: '0x000000000000000000000000000000000000dEaD',
                 value: 0n,
                 data: '0x' 
             });
