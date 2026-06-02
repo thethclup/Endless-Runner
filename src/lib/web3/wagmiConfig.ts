@@ -1,14 +1,15 @@
-import { createConfig, http } from 'wagmi'
-import { base, baseSepolia } from 'wagmi/chains'
-import { injected } from 'wagmi/connectors'
+import { createConfig, http } from 'wagmi';
+import { base, baseSepolia } from 'wagmi/chains';
+import { injected, coinbaseWallet } from 'wagmi/connectors';
 
 export const wagmiConfig = createConfig({
   chains: [base, baseSepolia],
   connectors: [
     injected(),
+    coinbaseWallet({ appName: 'Endless Runner Dash' }),
   ],
   transports: {
-    [base.id]: http(),
-    [baseSepolia.id]: http(),
+    [base.id]: http('https://mainnet.base.org'),
+    [baseSepolia.id]: http('https://sepolia.base.org'),
   },
-})
+});

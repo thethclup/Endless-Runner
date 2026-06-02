@@ -1,18 +1,23 @@
 import React, { useState } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, useSwitchChain } from 'wagmi';
+import { base } from 'wagmi/chains';
 import { useERC8021Transaction } from '../../lib/erc8021/hooks/useERC8021Transaction';
 import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle2, ExternalLink, X } from 'lucide-react';
 
 export function SayGMButton() {
-    const { address, isConnected } = useAccount();
+    const { address, isConnected, chainId } = useAccount();
+    const { switchChainAsync } = useSwitchChain();
     const { sendTransaction, isPending } = useERC8021Transaction();
     const [txHash, setTxHash] = useState<string | null>(null);
     const [showModal, setShowModal] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const handleSayGM = async () => {
         if (!isConnected || !address) return;
+        setError(null);
         try {
+            if (chainId !== base.id) await switchChainAsync({ chainId: base.id });
             const hash = await sendTransaction({
                 to: address,
                 value: 0n, // 0 ETH self-transfer
@@ -21,21 +26,25 @@ export function SayGMButton() {
             
             setTxHash(hash);
             setShowModal(true);
-        } catch (error) {
-            console.error("GM Failed:", error);
+        } catch (err: any) {
+            console.error("GM Failed:", err);
+            setError(err?.shortMessage ?? err?.message ?? 'Transaction failed');
         }
     };
 
+    const explorerBase = chainId === 84532 ? 'https://sepolia.basescan.org' : 'https://basescan.org';
+
     return (
-        <>
+        <div className="flex-1 flex flex-col">
             <button 
                 onClick={handleSayGM} 
                 disabled={isPending || !isConnected} 
-                className="flex-1 py-3 glass hover:bg-white/10 cyber-btn transition-colors text-[10px] sm:text-xs font-bold tracking-widest uppercase disabled:opacity-50 relative overflow-hidden group"
+                className="w-full py-3 glass hover:bg-white/10 cyber-btn transition-colors text-[10px] sm:text-xs font-bold tracking-widest uppercase disabled:opacity-50 relative overflow-hidden group"
             >
                 <span className="relative z-10">{isPending ? 'Sending...' : 'Say GM'}</span>
                 <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-cyan-500/0 via-cyan-400/10 to-cyan-500/0 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
             </button>
+            {error && <p className="text-red-400 text-xs mt-2 text-center">{error}</p>}
 
             <AnimatePresence>
                 {showModal && txHash && (
@@ -70,7 +79,7 @@ export function SayGMButton() {
                             </div>
 
                             <a 
-                                href={`https://basescan.org/tx/${txHash}`} 
+                                href={`${explorerBase}/tx/${txHash}`} 
                                 target="_blank" 
                                 rel="noreferrer"
                                 className="w-full py-3 bg-white/5 hover:bg-white/10 cyber-btn font-bold tracking-widest text-sm rounded-xl uppercase flex items-center justify-center gap-2 transition-colors"
@@ -81,6 +90,6 @@ export function SayGMButton() {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </>
+        </div>
     );
 }

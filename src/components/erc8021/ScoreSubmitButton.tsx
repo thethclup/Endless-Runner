@@ -9,8 +9,8 @@ interface ScoreSubmitButtonProps {
 }
 
 export function ScoreSubmitButton({ score }: ScoreSubmitButtonProps) {
-    const { isConnected } = useAccount();
-    const { submitScore, isSubmitting, txHash } = useOnchainScore();
+    const { isConnected, chainId } = useAccount();
+    const { submitScore, isSubmitting, txHash, error } = useOnchainScore();
     const [showModal, setShowModal] = useState(false);
 
     const handleRecordScore = async () => {
@@ -20,6 +20,8 @@ export function ScoreSubmitButton({ score }: ScoreSubmitButtonProps) {
             setShowModal(true);
         }
     };
+
+    const explorerBase = chainId === 84532 ? 'https://sepolia.basescan.org' : 'https://basescan.org';
 
     return (
         <>
@@ -39,6 +41,7 @@ export function ScoreSubmitButton({ score }: ScoreSubmitButtonProps) {
                     <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-pink-500/0 via-pink-500/20 to-pink-500/0 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
                 )}
             </button>
+            {error && <p className="text-red-400 text-xs text-center mt-2">{error}</p>}
 
             <AnimatePresence>
                 {showModal && txHash && (
@@ -79,7 +82,7 @@ export function ScoreSubmitButton({ score }: ScoreSubmitButtonProps) {
                             </div>
 
                             <a 
-                                href={`https://basescan.org/tx/${txHash}`} 
+                                href={`${explorerBase}/tx/${txHash}`} 
                                 target="_blank" 
                                 rel="noreferrer"
                                 className="w-full py-3 bg-white/5 hover:bg-white/10 cyber-btn font-bold tracking-widest text-sm rounded-xl uppercase flex items-center justify-center gap-2 transition-colors neon-magenta"

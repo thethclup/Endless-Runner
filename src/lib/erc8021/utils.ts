@@ -16,22 +16,15 @@ function stringToHex(str: string): string {
  * Generates an ERC-8021 compliant suffix (Schema 0).
  */
 export function generateERC8021Suffix(config: ERC8021Config): string {
-    const schemaHex = config.schema === 1 ? "01" : config.schema === 2 ? "02" : SCHEMA_ID_0; 
-    
-    const codes = [];
+    const schemaHex = config.schema === 1 ? '01' : config.schema === 2 ? '02' : SCHEMA_ID_0;
+    const codes: string[] = [];
     if (config.attributionCode) codes.push(config.attributionCode);
     if (config.builderCode) codes.push(config.builderCode);
-    
-    const codesString = codes.join(",");
+    const codesString = codes.join(',');
     const codesHex = stringToHex(codesString);
-    
-    // codesLength is the byte length of the string
-    const codesLengthHex = codesString.length.toString(16).padStart(2, "0");
-    
-    // codes + codesLength(1) + schemaId(1) + ercMarker(16)
-    const suffix = `${codesHex}${codesLengthHex}${schemaHex}${ERC8021_MAGIC_BYTES}`;
-    
-    return suffix;
+    const byteLength = new TextEncoder().encode(codesString).length;
+    const codesLengthHex = byteLength.toString(16).padStart(2, '0');
+    return codesHex + codesLengthHex + schemaHex + ERC8021_MAGIC_BYTES;
 }
 
 /**
