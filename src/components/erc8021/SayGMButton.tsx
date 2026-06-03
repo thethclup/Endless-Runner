@@ -20,8 +20,8 @@ export function SayGMButton() {
         try {
             if (chainId !== base.id) await switchChainAsync({ chainId: base.id });
             const hash = await sendTransaction({
-                to: '0x000000000000000000000000000000000000dEaD',
-                value: 0n, // 0 ETH 
+                to: address,
+                value: 0n, // 0 ETH self-transfer
                 data: '0x474d' // "GM" in hex
             }, ATTRIBUTION_CODE, BUILDER_CODE);
             
@@ -29,7 +29,13 @@ export function SayGMButton() {
             setShowModal(true);
         } catch (err: any) {
             console.error("GM Failed:", err);
-            setError(err?.shortMessage ?? err?.message ?? 'Transaction failed');
+            const msg = err?.shortMessage ?? err?.message ?? 'Transaction failed';
+            
+            if (msg.includes("internal accounts")) {
+                setError("Smart Wallet (EIP-4337) detected. Smart Wallets do not allow 0 ETH transfers + data to EOAs. Please use a standard EOA wallet like MetaMask.");
+            } else {
+                setError(msg);
+            }
         }
     };
 

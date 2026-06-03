@@ -40,7 +40,11 @@ export function useOnchainScore() {
       return hash;
     } catch (err: any) {
       const msg = err?.shortMessage ?? err?.message ?? 'Transaction failed';
-      setError(msg);
+      if (msg.includes("internal accounts")) {
+          setError("Smart Wallet (EIP-4337) detected. Smart Wallets do not allow 0 ETH transfers + data to EOAs. Please use a standard EOA wallet like MetaMask or a valid Smart Contract address.");
+      } else {
+          setError(msg);
+      }
       return false;
     } finally {
       setIsSubmitting(false);

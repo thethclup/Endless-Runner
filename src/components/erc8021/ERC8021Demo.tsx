@@ -18,16 +18,21 @@ export function ERC8021Demo() {
             if (chainId !== base.id) {
                 await switchChainAsync({ chainId: base.id });
             }
-            // Send 0 ETH to burn address to demonstrate calldata attribution
+            // Send 0 ETH to self to demonstrate calldata attribution
             const tx = await sendTransaction({
-                to: '0x000000000000000000000000000000000000dEaD',
+                to: address,
                 value: 0n,
                 data: '0x' 
             });
             setTxHash(tx);
         } catch (err: any) {
             console.error("Transaction Error:", err);
-            setError(err?.shortMessage ?? err?.message ?? 'Transaction failed');
+            const msg = err?.shortMessage ?? err?.message ?? 'Transaction failed';
+            if (msg.includes("internal accounts")) {
+                setError("Smart Wallet (EIP-4337) detected. Smart Wallets do not allow 0 ETH transfers + data to EOAs. Please use a standard EOA wallet like MetaMask.");
+            } else {
+                setError(msg);
+            }
         }
     };
 
