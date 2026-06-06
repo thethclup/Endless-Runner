@@ -71,6 +71,7 @@ export class CanvasEngine {
 
   // Input handling
   private touchStartY: number = 0;
+  private touchStartX: number = 0;
 
   constructor(canvas: HTMLCanvasElement, config: EngineConfig) {
     this.canvas = canvas;
@@ -124,19 +125,24 @@ export class CanvasEngine {
 
       if (type === 'start') {
           this.touchStartY = y;
+          this.touchStartX = 0; // Using 0 for start X in simplistic call
+          // Actually we don't have X from GameScreen currently. Let's adapt handling.
           // TAP to jump
-          if (this.player.state === 'RUN' || this.player.state === 'SLIDE') {
+          if (this.player.state === 'RUN') {
               this.player.vy = this.jumpForce;
               this.player.state = 'JUMP';
-              this.spawnParticles(this.player.x + this.player.width/2, this.player.y + this.player.height, 10, '#0ff');
+              this.spawnParticles(this.player.x + this.player.width/2, this.player.y + this.player.height, 10, '#E8A020');
           }
       } else if (type === 'move') {
           const dy = y - this.touchStartY;
-          // Swipe down to slide
-          if (dy > 50 && this.player.state === 'RUN') {
-              this.player.state = 'SLIDE';
-              this.player.slideTimer = 0.8; // seconds
+          // Swipe up or down logic - simplest way to trigger warp without full swipe logic
+          // So if we are in air and swiped enough distance, WARP!
+          if (Math.abs(dy) > 50 && this.player.state === 'JUMP') {
+              this.player.state = 'DASH';
+              this.player.slideTimer = 0.3; // Warp duration 0.3s
+              this.player.vy = 0; // stop gravity
               this.touchStartY = y; // reset
+              this.spawnParticles(this.player.x, this.player.y, 20, '#E8A020');
           }
       }
   }
@@ -184,12 +190,17 @@ export class CanvasEngine {
               this.player.state = 'RUN';
               this.combo += 0.1; // combo up on successful landing
               if(this.combo > 5) this.combo = 5;
-              this.spawnParticles(this.player.x + this.player.width/2, this.player.y + this.player.height, 5, '#f472b6');
+              this.spawnParticles(this.player.x + this.player.width/2, this.player.y + this.player.height, 5, '#E8A020');
           }
-      } else if (this.player.state === 'SLIDE') {
+      } else if (this.player.state === 'DASH') {
           this.player.slideTimer -= dt;
+          // spawn small particle trail
+          if (Math.random() > 0.5) {
+              this.spawnParticles(this.player.x, this.player.y + this.player.height/2, 2, '#fff');
+          }
           if (this.player.slideTimer <= 0) {
-              this.player.state = 'RUN';
+              this.player.state = 'JUMP';
+              this.player.vy = 0; // slight hover before falling again
           }
       } else {
          // RUN
@@ -239,9 +250,9 @@ export class CanvasEngine {
 
       const pRect = {
           x: this.player.x + 10, // hitbox margin
-          y: this.player.state === 'SLIDE' ? this.player.y + 30 : this.player.y,
+          y: this.player.y,
           width: this.player.width - 20,
-          height: this.player.state === 'SLIDE' ? 30 : this.player.height
+          height: this.player.height
       };
 
       // Move and collide obstacles
@@ -251,7 +262,7 @@ export class CanvasEngine {
 
           const oRect = { x: obs.x, y: obs.y, width: obs.width, height: obs.height };
 
-          if (this.checkCollision(pRect, oRect)) {
+          if (this.player.state !== 'DASH' && this.checkCollision(pRect, oRect)) {
               this.combo = 1.0;
               this.running = false;
               this.config.onGameOver({ distance: this.distance, score: this.score, combo: this.combo });
@@ -312,13 +323,13 @@ export class CanvasEngine {
   }
 
   private draw() {
-      // Clear with slight trail effect but transparent enough to see the mesh
-      this.ctx.fillStyle = 'rgba(6, 2, 18, 0.4)'; // dark with opacity
+      // Draw Base/Grid
+      this.ctx.fillStyle = 'rgba(5, 5, 5, 0.5)'; // dark with opacity
       this.ctx.fillRect(0, 0, this.width, this.height);
 
-      // Floor grid
-      this.ctx.strokeStyle = '#083344'; // cyan-950
-      this.ctx.lineWidth = 2;
+      this.ctx.strokeStyle = '#E8A020'; // neon orange grid
+      this.ctx.globalAlpha = 0.3;
+      this.ctx.lineWidth = 1;
       this.ctx.beginPath();
       this.ctx.moveTo(0, this.floorY);
       this.ctx.lineTo(this.width, this.floorY);
@@ -331,10 +342,11 @@ export class CanvasEngine {
          this.ctx.lineTo(i - offset - 40, this.height);
          this.ctx.stroke();
       }
+      this.ctx.globalAlpha = 1.0;
 
       // Draw Collectibles
       for (const col of this.collectibles) {
-          this.ctx.fillStyle = col.type === 'MULTIPLIER' ? '#eab308' : '#06b6d4';
+          this.ctx.fillStyle = col.type === 'MULTIPLIER' ? '#E8A020' : '#4ade80';
           this.ctx.shadowColor = this.ctx.fillStyle;
           this.ctx.shadowBlur = 10;
           this.ctx.beginPath();
@@ -345,7 +357,7 @@ export class CanvasEngine {
 
       // Draw Obstacles
       for (const obs of this.obstacles) {
-          this.ctx.fillStyle = obs.type === 'WALL' ? '#a21caf' : '#be123c';
+          this.ctx.fillStyle = '#ef4444'; // Red lasers/spikes
           this.ctx.shadowColor = this.ctx.fillStyle;
           this.ctx.shadowBlur = 15;
           this.ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
@@ -368,16 +380,16 @@ export class CanvasEngine {
       }
       this.ctx.globalAlpha = 1.0;
 
-      // Draw Player
-      this.ctx.shadowColor = '#0ff';
-      this.ctx.shadowBlur = 10;
-      this.ctx.fillStyle = '#22d3ee'; // cyan-400
+      // Draw Warp Jumper (Player)
+      this.ctx.shadowColor = '#E8A020';
+      this.ctx.shadowBlur = this.player.state === 'DASH' ? 25 : 10;
+      this.ctx.fillStyle = this.player.state === 'DASH' ? '#fff' : '#E8A020';
       
       const pRect = {
           x: this.player.x,
-          y: this.player.state === 'SLIDE' ? this.player.y + 30 : this.player.y,
+          y: this.player.y,
           width: this.player.width,
-          height: this.player.state === 'SLIDE' ? 30 : this.player.height
+          height: this.player.height
       };
       
       this.ctx.fillRect(pRect.x, pRect.y, pRect.width, pRect.height);
@@ -385,6 +397,6 @@ export class CanvasEngine {
       // Cyberpunk runner detail
       this.ctx.fillStyle = '#fff';
       this.ctx.shadowBlur = 0;
-      this.ctx.fillRect(pRect.x + pRect.width/2 + 5, pRect.y + 5, 8, 4); // eye visor
+      this.ctx.fillRect(pRect.x + pRect.width/2 + 5, pRect.y + 10, 10, 4); // eye visor
   }
 }

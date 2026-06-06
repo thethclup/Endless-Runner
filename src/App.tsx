@@ -3,10 +3,13 @@ import { GameState, ScoreData } from './types';
 import TitleScreen from './components/TitleScreen';
 import GameScreen from './components/GameScreen';
 import GameOverScreen from './components/GameOverScreen';
+import { SayGMButton } from './components/erc8021/SayGMButton';
+import { useAccount } from 'wagmi';
 
 export default function App() {
   const [gameState, setGameState] = useState<GameState>('TITLE');
   const [lastScore, setLastScore] = useState<ScoreData>({ distance: 0, score: 0, combo: 0 });
+  const { isConnected } = useAccount();
   const [highScore, setHighScore] = useState<number>(() => {
     const saved = localStorage.getItem('runner_high_score');
     return saved ? parseInt(saved, 10) : 0;
@@ -37,7 +40,13 @@ export default function App() {
       
       {/* Visual artifacts / scanlines overlay for cyberpunk feel */}
       <div className="pointer-events-none absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')] opacity-30 mix-blend-overlay"></div>
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-cyan-900/10 to-pink-900/20 mix-blend-screen"></div>
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-[#E8A020]/10 to-transparent mix-blend-screen"></div>
+
+      {isConnected && (
+        <div className="absolute top-4 right-4 z-50">
+          <SayGMButton />
+        </div>
+      )}
     </div>
   );
 }

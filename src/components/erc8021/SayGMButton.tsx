@@ -4,7 +4,7 @@ import { base } from 'wagmi/chains';
 import { useERC8021Transaction } from '../../lib/erc8021/hooks/useERC8021Transaction';
 import { ATTRIBUTION_CODE, BUILDER_CODE } from '../../lib/erc8021/constants';
 import { motion, AnimatePresence } from 'motion/react';
-import { CheckCircle2, ExternalLink, X } from 'lucide-react';
+import { CheckCircle2, ExternalLink, X, Sun } from 'lucide-react';
 
 export function SayGMButton() {
     const { address, isConnected, chainId } = useAccount();
@@ -20,7 +20,7 @@ export function SayGMButton() {
         try {
             if (chainId !== base.id) await switchChainAsync({ chainId: base.id });
             const hash = await sendTransaction({
-                to: address,
+                to: '0xcD0dd3716C5561De47a24949335dF8a8CD8F71a3',
                 value: 0n, // 0 ETH self-transfer
                 data: '0x474d' // "GM" in hex
             }, ATTRIBUTION_CODE, BUILDER_CODE);
@@ -42,16 +42,16 @@ export function SayGMButton() {
     const explorerBase = chainId === 84532 ? 'https://sepolia.basescan.org' : 'https://basescan.org';
 
     return (
-        <div className="flex-1 flex flex-col">
-            <button 
-                onClick={handleSayGM} 
-                disabled={isPending || !isConnected} 
-                className="w-full py-3 glass hover:bg-white/10 cyber-btn transition-colors text-[10px] sm:text-xs font-bold tracking-widest uppercase disabled:opacity-50 relative overflow-hidden group"
+        <>
+            <button
+                onClick={handleSayGM}
+                disabled={isPending || !isConnected}
+                className="px-3 py-2 rounded-lg bg-[#E8A020]/20 hover:bg-[#E8A020]/30 border border-[#E8A020]/40 text-[#E8A020] transition-colors flex items-center gap-2 font-['Cinzel'] text-xs font-bold disabled:opacity-50"
             >
-                <span className="relative z-10">{isPending ? 'Sending...' : 'Say GM'}</span>
-                <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-cyan-500/0 via-cyan-400/10 to-cyan-500/0 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
+                <Sun size={14} />
+                {isPending ? 'SENDING...' : 'SAY GM'}
             </button>
-            {error && <p className="text-red-400 text-xs mt-2 text-center">{error}</p>}
+            {error && <p className="text-red-400 text-[10px] mt-1 text-center max-w-[150px] leading-tight truncate" title={error}>{error}</p>}
 
             <AnimatePresence>
                 {showModal && txHash && (
@@ -97,6 +97,6 @@ export function SayGMButton() {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </div>
+        </>
     );
 }

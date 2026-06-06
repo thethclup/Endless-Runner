@@ -29,9 +29,9 @@ export default function TitleScreen({ onStart, highScore }: TitleScreenProps) {
           className="text-center mb-12 relative"
         >
           <h1 className="text-6xl md:text-8xl font-black italic tracking-tighter mb-2 leading-none">
-            ENDLESS
+            WARP
             <br />
-            <span className="neon-cyan">RUNNER</span> DASH
+            <span className="text-[#E8A020] [text-shadow:0_0_20px_#E8A020]">JUMPER</span>
           </h1>
           <p className="mt-4 text-slate-400 uppercase tracking-[0.4em] text-xs md:text-sm">Base Mainnet Edition</p>
         </motion.div>
@@ -40,9 +40,9 @@ export default function TitleScreen({ onStart, highScore }: TitleScreenProps) {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={onStart}
-          className="w-full max-w-xs py-5 mb-6 rounded-2xl font-black text-xl uppercase tracking-widest bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-[0_0_40px_rgba(6,182,212,0.4)] transition-all"
+          className="w-full max-w-xs py-5 mb-6 rounded-2xl font-black text-xl uppercase tracking-widest bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-white shadow-[0_0_40px_rgba(232,160,32,0.4)] transition-all"
         >
-          START DASH
+          START WARP
         </motion.button>
 
         <div className="w-full max-w-xs space-y-4 font-mono text-sm">
@@ -64,8 +64,7 @@ export default function TitleScreen({ onStart, highScore }: TitleScreenProps) {
                    <p className="text-xs text-slate-400 truncate w-full px-2">
                        {address?.substring(0,6)}...{address?.substring(address.length - 4)}
                    </p>
-                   <div className="flex gap-2">
-                     <SayGMButton />
+                   <div className="flex gap-2 justify-center">
                      <button onClick={() => disconnect()} className="flex-1 py-3 glass hover:bg-white/10 cyber-btn transition-colors text-[10px] sm:text-xs font-bold tracking-widest uppercase">
                         Disconnect
                      </button>
