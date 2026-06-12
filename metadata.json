@@ -2,5 +2,5 @@
   "name": "Endless Runner Dash",
   "description": "A cyberpunk endless runner on Base Mainnet",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
