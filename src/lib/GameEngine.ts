@@ -36,7 +36,6 @@ export class CanvasEngine {
   private running: boolean = false;
   
   private lastTime: number = 0;
-  private lastHudUpdateTime: number = 0;
   
   // Dimensions
   private width: number = 0;
@@ -310,11 +309,8 @@ export class CanvasEngine {
           if(p.life <= 0) this.particles.splice(i, 1);
       }
 
-      // HUD update (throttle to ~3 times per second to prevent React render storms)
-      if (time - this.lastHudUpdateTime > 333) {
-          this.config.onScoreUpdate({ distance: this.distance, score: this.score, combo: this.combo });
-          this.lastHudUpdateTime = time;
-      }
+      // Update stats continuously, caller decides when to trigger renders
+      this.config.onScoreUpdate({ distance: this.distance, score: this.score, combo: this.combo });
   }
 
   private checkCollision(r1: {x:number,y:number,width:number,height:number}, r2: {x:number,y:number,width:number,height:number}) {

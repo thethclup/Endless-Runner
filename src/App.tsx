@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { GameState, ScoreData } from './types';
 import TitleScreen from './components/TitleScreen';
 import GameScreen from './components/GameScreen';
@@ -15,22 +15,22 @@ export default function App() {
     return saved ? parseInt(saved, 10) : 0;
   });
 
-  const handleStartGame = () => {
+  const handleStartGame = useCallback(() => {
     setGameState('PLAYING');
-  };
+  }, []);
 
-  const handleGameOver = (scoreData: ScoreData) => {
+  const handleGameOver = useCallback((scoreData: ScoreData) => {
     setLastScore(scoreData);
     if (scoreData.score > highScore) {
       setHighScore(Math.floor(scoreData.score));
       localStorage.setItem('runner_high_score', Math.floor(scoreData.score).toString());
     }
     setGameState('GAMEOVER');
-  };
+  }, [highScore]);
 
-  const handleGoToTitle = () => {
+  const handleGoToTitle = useCallback(() => {
     setGameState('TITLE');
-  };
+  }, []);
 
   return (
     <div className="w-full h-full min-h-[100dvh] bg-mesh text-white overflow-hidden relative font-sans touch-none selection:bg-transparent">

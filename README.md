@@ -4,9 +4,9 @@ Endless Runner platformunda çalışan ERC-8004 uyumlu AI Agent. Endless running
 
 ## Overview
 
-Endless Runner Dash is a cyberpunk-themed, Web3-enabled endless runner game natively integrated with Base network. The agent uses the standard Model Context Protocol (MCP) to supply external AI models with tools necessary for runner automation, real-time control, and execution on Base mainnet.
+Endless Runner Dash is a cyberpunk-themed, onchain-enabled endless runner game natively integrated with Base network. The agent uses the standard Model Context Protocol (MCP) to supply external AI models with tools necessary for runner automation, real-time control, and execution on Base mainnet.
 
-## Web3 Configuration & Links
+## Onchain Configuration & Links
 
 - **Agent Wallet**: `0xe157F1F5e12adB38Ba013683E9Ce24efe21e5bA6`
 - **Supported Chains**: Base Mainnet (`eip155:8453`)
@@ -40,7 +40,7 @@ This project fully supports the Model Context Protocol (MCP). External AI orches
 
 - `get_race_status`: Get the current endless runner race status and metrics.
 - `start_race`: Initialize and start a new endless runner race sequence.
-- `get_leaderboard`: Retrieve the current on-chain endless runner leaderboard.
+- `get_leaderboard`: Retrieve the current onchain endless runner leaderboard.
 - `optimize_speed`: Calculate and apply speed optimizations for the runner.
 - `get_track_info`: Retrieve procedural generation details for the current track.
 

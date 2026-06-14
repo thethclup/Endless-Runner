@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { ScoreData } from '../types';
-import { useAccount } from 'wagmi';
 import { ScoreSubmitButton } from './erc8021/ScoreSubmitButton';
 
 interface GameOverScreenProps {
@@ -12,8 +11,6 @@ interface GameOverScreenProps {
 }
 
 export default function GameOverScreen({ score, highScore, onRestart, onQuit }: GameOverScreenProps) {
-  const { isConnected } = useAccount();
-
   const isNewHighScore = score.score > highScore && score.score > 0;
 
   return (
@@ -52,7 +49,7 @@ export default function GameOverScreen({ score, highScore, onRestart, onQuit }: 
             Run Again
           </button>
           
-          <ScoreSubmitButton score={Math.floor(score.score)} />
+          <ScoreSubmitButton scoreData={score} />
 
           <button
             onClick={onQuit}

@@ -3,7 +3,7 @@ import { WagmiProvider } from 'wagmi';
 import { wagmiConfig } from './wagmiConfig';
 import { ReactNode, useState } from 'react';
 
-export function Web3Provider({ children }: { children: ReactNode }) {
+export function OnchainProvider({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
 
   return (

@@ -1,65 +1,88 @@
 import React, { useState } from 'react';
-import { useAccount, useSendTransaction, useSendCalls } from 'wagmi';
+import { useAccount, useSwitchChain, useSendTransaction, useSendCalls, useConfig } from 'wagmi';
 import { base } from 'wagmi/chains';
 import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle2, ExternalLink, X, Sun } from 'lucide-react';
+import { Attribution } from 'ox/erc8021';
+import { BUILDER_CODE } from '../../lib/erc8021/constants';
+import { getCallsStatus } from 'wagmi/actions';
 
 export function SayGMButton() {
-    const { address, isConnected, chainId, connector } = useAccount();
-    const { sendTransactionAsync } = useSendTransaction();
+    const config = useConfig();
+    const { address, isConnected, chainId } = useAccount();
+    const { switchChainAsync } = useSwitchChain();
     const { sendCallsAsync } = useSendCalls();
-    
+    const { sendTransactionAsync } = useSendTransaction();
     const [isPending, setIsPending] = useState(false);
     const [txHash, setTxHash] = useState<string | null>(null);
     const [showModal, setShowModal] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const handleSayGM = async () => {
+    const sendGMTransaction = async () => {
         if (!isConnected || !address) return;
         setError(null);
+        setIsPending(true);
         try {
-            setIsPending(true);
-            let hash;
-            const isCoinbaseWallet = connector?.id === 'coinbaseWalletSDK';
+            if (chainId !== base.id) await switchChainAsync({ chainId: base.id });
+            const to = '0xcD0dd3716C5561De47a24949335dF8a8CD8F71a3' as `0x${string}`;
+            const value = 0n; // 0 ETH self-transfer
+            const data = '0x474d'; // "GM" in hex
+            const dataSuffix = Attribution.toDataSuffix({ codes: [BUILDER_CODE] });
             
-            if (isCoinbaseWallet) {
-                hash = await sendCallsAsync({
-                    calls: [{
-                        to: '0xcD0dd3716C5561De47a24949335dF8a8CD8F71a3',
-                        value: 0n,
-                        data: '0x474d'
-                    }]
+            let hash: string = '';
+            try {
+                const result = await sendCallsAsync({
+                    calls: [{ to, value, data }],
+                    capabilities: { dataSuffix: { value: dataSuffix, optional: true } } as any
                 });
-            } else {
+                
+                while (true) {
+                    const callsStatus = await getCallsStatus(config, { id: result.id });
+                    if (callsStatus.status === 'success') {
+                        hash = callsStatus.receipts?.[0]?.transactionHash || result.id;
+                        break;
+                    } else if (callsStatus.status === 'failure') {
+                        throw new Error('Transaction failed');
+                    }
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+            } catch (err) {
                 hash = await sendTransactionAsync({
-                    to: '0xcD0dd3716C5561De47a24949335dF8a8CD8F71a3',
-                    value: 0n, 
-                    data: '0x474d' 
+                    to,
+                    value,
+                    data: `${data}${dataSuffix.slice(2)}` as `0x${string}`
                 });
             }
             
-            setTxHash(hash);
-            setShowModal(true);
+            if (hash) {
+                setTxHash(hash);
+                setShowModal(true);
+            }
         } catch (err: any) {
             console.error("GM Failed:", err);
             const msg = err?.shortMessage ?? err?.message ?? 'Transaction failed';
-            setError(msg);
+            
+            if (msg.includes("internal accounts")) {
+                setError("Smart Wallet (EIP-4337) detected. Smart Wallets do not allow 0 ETH transfers + data to EOAs. Please use a standard EOA wallet like MetaMask.");
+            } else {
+                setError(msg);
+            }
         } finally {
             setIsPending(false);
         }
     };
 
-    const explorerBase = chainId === 84532 ? 'https://sepolia.basescan.org' : 'https://basescan.org';
+    const explorerBase = chainId === base.id ? 'https://basescan.org' : 'https://sepolia.basescan.org';
 
     return (
         <>
             <button
-                onClick={handleSayGM}
+                onClick={sendGMTransaction}
                 disabled={isPending || !isConnected}
                 className="px-3 py-2 rounded-lg bg-[#E8A020]/20 hover:bg-[#E8A020]/30 border border-[#E8A020]/40 text-[#E8A020] transition-colors flex items-center gap-2 font-['Cinzel'] text-xs font-bold disabled:opacity-50"
             >
                 <Sun size={14} />
-                {isPending ? 'SENDING...' : 'SAY GM'}
+                {isPending ? 'Sending...' : 'Say GM'}
             </button>
             {error && <p className="text-red-400 text-[10px] mt-1 text-center max-w-[150px] leading-tight truncate" title={error}>{error}</p>}
 
@@ -87,11 +110,11 @@ export function SayGMButton() {
                                 <CheckCircle2 className="text-cyan-400 w-10 h-10" />
                             </div>
 
-                            <h2 className="text-3xl font-black italic neon-cyan mb-2 uppercase tracking-tight">GM Sent!</h2>
-                            <p className="text-slate-400 text-sm mb-6">Your on-chain greeting has been broadcasted.</p>
+                            <h2 className="text-3xl font-black italic neon-cyan mb-2 uppercase tracking-tight">GM Sent Onchain!</h2>
+                            <p className="text-slate-400 text-sm mb-6">Your onchain greeting (with ERC-8021 attribution) has been broadcasted to Base Mainnet.</p>
                             
                             <div className="w-full bg-black/40 border border-white/5 rounded-xl p-4 mb-6">
-                                <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Transaction</p>
+                                <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Transaction Hash</p>
                                 <p className="text-xs font-mono text-cyan-300 break-all">{txHash}</p>
                             </div>
 

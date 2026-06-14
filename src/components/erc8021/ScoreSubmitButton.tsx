@@ -1,27 +1,29 @@
 import React, { useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useOnchainScore } from '../../hooks/useOnchainScore';
+import { base } from 'wagmi/chains';
 import { motion, AnimatePresence } from 'motion/react';
 import { ShieldCheck, ExternalLink, X } from 'lucide-react';
+import { ScoreData } from '../../types';
 
 interface ScoreSubmitButtonProps {
-    score: number;
+    scoreData: ScoreData;
 }
 
-export function ScoreSubmitButton({ score }: ScoreSubmitButtonProps) {
+export function ScoreSubmitButton({ scoreData }: ScoreSubmitButtonProps) {
     const { isConnected, chainId } = useAccount();
     const { submitScore, isSubmitting, txHash, error } = useOnchainScore();
     const [showModal, setShowModal] = useState(false);
 
     const handleRecordScore = async () => {
         if (!isConnected) return;
-        const hash = await submitScore(score);
+        const hash = await submitScore(scoreData);
         if (hash) {
             setShowModal(true);
         }
     };
 
-    const explorerBase = chainId === 84532 ? 'https://sepolia.basescan.org' : 'https://basescan.org';
+    const explorerBase = chainId === base.id ? 'https://basescan.org' : 'https://sepolia.basescan.org';
 
     return (
         <>
@@ -35,7 +37,7 @@ export function ScoreSubmitButton({ score }: ScoreSubmitButtonProps) {
                 }`}
             >
                 <span className="relative z-10">
-                    {!isConnected ? 'Wallet Not Connected' : txHash ? 'Secured On-Chain!' : isSubmitting ? 'Securing...' : 'Record Score On-Chain'}
+                    {!isConnected ? 'Wallet Not Connected' : txHash ? 'Secured Onchain!' : isSubmitting ? 'Securing...' : 'Record Score Onchain'}
                 </span>
                 {!txHash && isConnected && !isSubmitting && (
                     <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-pink-500/0 via-pink-500/20 to-pink-500/0 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
@@ -73,7 +75,7 @@ export function ScoreSubmitButton({ score }: ScoreSubmitButtonProps) {
                             <div className="w-full bg-black/40 border border-white/5 rounded-xl p-4 mb-6 space-y-4">
                                 <div className="flex justify-between items-center pb-4 border-b border-white/5">
                                     <span className="text-slate-400 uppercase tracking-widest text-xs">Score</span>
-                                    <span className="text-xl font-bold font-mono text-white">{score.toLocaleString()}</span>
+                                    <span className="text-xl font-bold font-mono text-white">{Math.floor(scoreData.score).toLocaleString()}</span>
                                 </div>
                                 <div className="text-left">
                                     <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Transaction Hash</p>

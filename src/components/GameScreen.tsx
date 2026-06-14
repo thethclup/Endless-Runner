@@ -11,13 +11,28 @@ export default function GameScreen({ onGameOver }: GameScreenProps) {
   const engineRef = useRef<CanvasEngine | null>(null);
   
   const [hud, setHud] = useState({ distance: 0, score: 0, combo: 1 });
+  const hudRef = useRef({ distance: 0, score: 0, combo: 1 });
 
   useEffect(() => {
     if (!canvasRef.current) return;
     
     // Initialize Game Engine
     engineRef.current = new CanvasEngine(canvasRef.current, {
-        onScoreUpdate: (data) => setHud(data),
+        onScoreUpdate: (data) => {
+            // Only update React state if integer values change
+            if (
+                Math.floor(data.score) > hudRef.current.score ||
+                Math.floor(data.distance) > hudRef.current.distance ||
+                Math.round(data.combo * 10) !== Math.round(hudRef.current.combo * 10)
+            ) {
+                hudRef.current = {
+                    score: Math.floor(data.score),
+                    distance: Math.floor(data.distance),
+                    combo: data.combo
+                };
+                setHud(hudRef.current);
+            }
+        },
         onGameOver: (finalScore) => {
              onGameOver(finalScore);
         }

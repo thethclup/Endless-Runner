@@ -15,7 +15,7 @@ const TOOLS = [
   },
   {
     name: "get_leaderboard",
-    description: "Retrieve the current on-chain endless runner leaderboard.",
+    description: "Retrieve the current onchain endless runner leaderboard.",
     inputSchema: { type: "object", properties: {} }
   },
   {
@@ -145,10 +145,9 @@ async function startServer() {
             toolText = JSON.stringify({
               leaderboard: [
                 { rank: 1, address: "0xe157F1F5e12adB38Ba013683E9Ce24efe21e5bA6", score: 98520, distance: 14200, timestamp: "2026-06-11T12:00:00Z", verified: true },
-                { rank: 2, address: "0xcD0dd3716C5561De47a24949335dF8a8CD8F71a3", score: 84150, distance: 12100, timestamp: "2026-06-11T14:30:00Z", verified: true },
-                { rank: 3, address: "0xd8da6bf26964af9d7eed9e03e53415d37aa96045", score: 75200, distance: 10800, timestamp: "2026-06-12T01:15:00Z", verified: true },
-                { rank: 4, address: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e", score: 62100, distance: 8900, timestamp: "2026-06-12T05:22:00Z", verified: true },
-                { rank: 5, address: "0x2D8c3C6CEdb94A3D7aCd730D98399564b73E7b18", score: 45120, distance: 6300, timestamp: "2026-06-12T09:41:00Z", verified: true }
+                { rank: 2, address: "0xd8da6bf26964af9d7eed9e03e53415d37aa96045", score: 75200, distance: 10800, timestamp: "2026-06-12T01:15:00Z", verified: true },
+                { rank: 3, address: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e", score: 62100, distance: 8900, timestamp: "2026-06-12T05:22:00Z", verified: true },
+                { rank: 4, address: "0x2D8c3C6CEdb94A3D7aCd730D98399564b73E7b18", score: 45120, distance: 6300, timestamp: "2026-06-12T09:41:00Z", verified: true }
               ],
               contract: {
                 network: "Base Mainnet",

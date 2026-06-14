@@ -3,12 +3,12 @@ import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 
-import { Web3Provider } from './lib/web3/providers.tsx';
+import { OnchainProvider } from './lib/onchain/providers.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Web3Provider>
+    <OnchainProvider>
       <App />
-    </Web3Provider>
+    </OnchainProvider>
   </StrictMode>,
 );
