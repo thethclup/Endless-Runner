@@ -1,7 +1,6 @@
 import { motion } from 'motion/react';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { SayGMButton } from './erc8021/SayGMButton';
-import { ATTRIBUTION_CODE, BUILDER_CODE } from '../lib/erc8021/constants';
 
 interface TitleScreenProps {
   onStart: () => void;
@@ -77,7 +76,7 @@ export default function TitleScreen({ onStart, highScore }: TitleScreenProps) {
       
       <div className="absolute bottom-6 text-slate-500 font-mono text-[10px] tracking-widest pointer-events-none flex flex-col items-center gap-1">
         <span>PROT: ERC-8021</span>
-        <span>ATTRIBUTION: {ATTRIBUTION_CODE || '[ATTRIBUTION_CODE]'} | BUILDER: {BUILDER_CODE}</span>
+        <span>BUILDER: {(import.meta as any).env?.VITE_BUILDER_CODE || 'bc_1aw46v36'}</span>
       </div>
     </div>
   );
