@@ -14,16 +14,7 @@ const TOOLS = [
   { name: "get_track_info", description: "Retrieve procedural generation details for the current track.", inputSchema: { type: "object", properties: {} } }
 ];
 
-const resourceServer = new x402ResourceServer()
-  .register("eip155:84532", new ExactEvmScheme())
-  .onProtectedRequest((context: any) => {
-    // We only want to require payment for actual tool calls, not MCP handshakes/initialization
-    const req = context.adapter.req;
-    if (req && req.body && req.body.method && req.body.method !== "tools/call") {
-      return { grantAccess: true };
-    }
-    return undefined;
-  });
+const resourceServer = new x402ResourceServer().register("eip155:84532", new ExactEvmScheme());
 
 app.use(
   paymentMiddleware(
@@ -48,18 +39,10 @@ app.use(
   )
 );
 
-// CORS preflight
-app.options("/api/mcp", (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Payment-Signature");
-  res.status(200).end();
-});
-
 app.get("/api/mcp", (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Payment-Signature");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   res.json({
     protocol: "MCP",
     version: "1.0.0",
@@ -76,8 +59,6 @@ app.get("/api/mcp", (req, res) => {
 
 app.post("/api/mcp", (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Payment-Signature");
 
   try {
     const body = req.body || {};
@@ -151,9 +132,10 @@ app.post("/api/mcp", (req, res) => {
         break;
     }
 
-    const result = { content: [{ type: "text", text: toolText }], isError: false };
-    const responsePayload = isJsonRpc ? { jsonrpc: "2.0", id, result } : result;
-    res.status(200).json(responsePayload);
+    res.json({
+      status: "success",
+      response: { message: "Tool executed via x402 protected MCP", data: JSON.parse(toolText) }
+    });
   } catch (error) {
     console.error("MCP Error:", error);
     res.status(500).json({ status: "error", message: "Internal MCP error" });

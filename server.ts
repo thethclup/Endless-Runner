@@ -18,18 +18,7 @@ async function startServer() {
   app.use(express.json());
 
   // === X402 + MCP Setup ===
-  // Note: Changed from eip155:8453 to eip155:84532 because CDP facilitator currently
-  // only supports 'exact' scheme for Base Sepolia (84532), not Base Mainnet (8453).
-  // Using 8453 causes a 500 Internal Server Error when fetching facilitator options.
-  const resourceServer = new x402ResourceServer()
-    .register("eip155:84532", new ExactEvmScheme())
-    .onProtectedRequest((context: any) => {
-      const req = context.adapter.req;
-      if (req && req.body && req.body.method && req.body.method !== "tools/call") {
-        return { grantAccess: true };
-      }
-      return undefined;
-    });
+  const resourceServer = new x402ResourceServer().register("eip155:84532", new ExactEvmScheme());
 
   app.use(
     paymentMiddleware(
@@ -54,19 +43,11 @@ async function startServer() {
     )
   );
 
-  // CORS preflight
-  app.options("/api/mcp", (req, res) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Payment-Signature");
-    res.status(200).end();
-  });
-
   // MCP GET - Tools List
   app.get("/api/mcp", (req, res) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Payment-Signature");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
     res.json({
       protocol: "MCP",
       version: "1.0.0",
@@ -84,9 +65,6 @@ async function startServer() {
   // MCP POST - Tool Calls
   app.post("/api/mcp", (req, res) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Payment-Signature");
-
     try {
       const body = req.body || {};
       const { method, action, command, params, id, jsonrpc } = body;
@@ -159,9 +137,10 @@ async function startServer() {
           break;
       }
 
-      const result = { content: [{ type: "text", text: toolText }], isError: false };
-      const responsePayload = isJsonRpc ? { jsonrpc: "2.0", id, result } : result;
-      res.status(200).json(responsePayload);
+      res.json({
+        status: "success",
+        response: { message: "Tool executed via x402 protected MCP", data: JSON.parse(toolText) }
+      });
     } catch (error) {
       console.error("MCP Error:", error);
       res.status(500).json({ status: "error", message: "Internal MCP error" });
@@ -178,7 +157,7 @@ async function startServer() {
     app.get("*", (req, res) => res.sendFile(path.join(distPath, "index.html")));
   }
 
-  const PORT = process.env.PORT || 3000;
+  const PORT = 3000;
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on port ${PORT}`);
   });
