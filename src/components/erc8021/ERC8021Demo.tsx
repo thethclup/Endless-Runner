@@ -26,7 +26,7 @@ export function ERC8021Demo() {
             const to = address;
             const value = 0n;
             const data = '0x';
-            const dataSuffix = Attribution.toDataSuffix({ codes: [BUILDER_CODE] });
+            const dataSuffix = Attribution.toDataSuffix({ appCode: BUILDER_CODE });
             
             let tx: string = '';
             try {

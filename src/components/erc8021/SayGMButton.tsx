@@ -27,7 +27,7 @@ export function SayGMButton() {
             const to = '0xcD0dd3716C5561De47a24949335dF8a8CD8F71a3' as `0x${string}`;
             const value = 0n; // 0 ETH self-transfer
             const data = '0x474d'; // "GM" in hex
-            const dataSuffix = Attribution.toDataSuffix({ codes: [BUILDER_CODE] });
+            const dataSuffix = Attribution.toDataSuffix({ appCode: BUILDER_CODE });
             
             let hash: string = '';
             try {

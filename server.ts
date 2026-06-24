@@ -1,6 +1,9 @@
 import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
+import { paymentMiddleware, x402ResourceServer } from "@x402/express";
+import { ExactEvmScheme } from "@x402/evm/exact/server";
+import { BUILDER_CODE, declareBuilderCodeExtension } from "@x402/extensions/builder-code";
 
 const TOOLS = [
   {
@@ -38,6 +41,31 @@ async function startServer() {
   app.use(express.json());
 
   // === MCP API ===
+  const resourceServer = new x402ResourceServer().register("eip155:8453", new ExactEvmScheme());
+
+  app.use(
+    paymentMiddleware(
+      {
+        "POST /api/mcp": {
+          accepts: [
+            {
+              scheme: "exact",
+              price: "100000000000000", // 0.0001 ETH
+              network: "eip155:8453",
+              payTo: "0xe157F1F5e12adB38Ba013683E9Ce24efe21e5bA6", // Orchestrator wallet
+            },
+          ],
+          description: "Endless Runner MCP API",
+          mimeType: "application/json",
+          extensions: {
+            [BUILDER_CODE]: declareBuilderCodeExtension("bc_1aw46v36"),
+          },
+        },
+      },
+      resourceServer
+    )
+  );
+
   app.get("/api/mcp", (req, res) => {
     res.json({
       protocol: "MCP",

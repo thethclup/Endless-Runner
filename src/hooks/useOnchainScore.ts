@@ -55,7 +55,7 @@ export function useOnchainScore() {
           ""
         ],
       });
-      const dataSuffix = Attribution.toDataSuffix({ codes: [BUILDER_CODE] });
+      const dataSuffix = Attribution.toDataSuffix({ appCode: BUILDER_CODE });
       
       let hash: string = '';
       try {

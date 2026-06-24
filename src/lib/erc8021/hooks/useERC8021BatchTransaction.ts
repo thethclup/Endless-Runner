@@ -6,7 +6,7 @@ export function useERC8021BatchTransaction() {
   const { sendCallsAsync } = useSendCalls();
   
   const sendBatch = async (transactions: { to: string; value: string; data: string }[]) => {
-    const dataSuffix = Attribution.toDataSuffix({ codes: [BUILDER_CODE] });
+    const dataSuffix = Attribution.toDataSuffix({ appCode: BUILDER_CODE });
     const result = await sendCallsAsync({
       calls: transactions.map(tx => ({
         to: tx.to as `0x${string}`,
