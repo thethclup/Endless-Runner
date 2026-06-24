@@ -40,6 +40,17 @@ async function startServer() {
   // Add JSON body parser for POST requests
   app.use(express.json());
 
+  // CORS headers for MCP
+  app.use("/api/mcp", (req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Payment-Signature');
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
+    }
+    next();
+  });
+
   // === MCP API ===
   const resourceServer = new x402ResourceServer().register("eip155:8453", new ExactEvmScheme());
 

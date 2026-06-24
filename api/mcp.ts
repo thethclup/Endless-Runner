@@ -6,6 +6,17 @@ import { BUILDER_CODE, declareBuilderCodeExtension } from "@x402/extensions/buil
 const app = express();
 app.use(express.json());
 
+// CORS headers
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Payment-Signature');
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  next();
+});
+
 const TOOLS = [
   {
     name: "get_race_status",
@@ -60,7 +71,6 @@ app.use(
 );
 
 app.get("/api/mcp", (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
   res.json({
     protocol: "MCP",
     version: "1.0.0",
@@ -80,7 +90,6 @@ app.get("/api/mcp", (req, res) => {
 });
 
 app.post("/api/mcp", (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
   try {
     const body = req.body || {};
     const { action, command, params, method, jsonrpc, id } = body;
