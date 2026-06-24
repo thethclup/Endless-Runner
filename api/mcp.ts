@@ -35,10 +35,7 @@ app.use(
         },
       },
     },
-    resourceServer,
-    undefined,
-    undefined,
-    false // Disable syncFacilitatorOnStart for serverless
+    resourceServer
   )
 );
 

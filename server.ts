@@ -42,10 +42,7 @@ async function startServer() {
           },
         },
       },
-      resourceServer,
-      undefined,
-      undefined,
-      false // Prevents the synchronous fetch on startup which can cause issues on Serverless.
+      resourceServer
     )
   );
 
