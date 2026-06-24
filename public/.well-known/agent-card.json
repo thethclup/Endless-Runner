@@ -50,7 +50,7 @@
     "ecosystem-coordination"
   ],
   "supportedChains": ["eip155:8453"],
-  "x402Support": false,
+  "x402Support": true,
   "registrations": [
     {
       "agentId": null,

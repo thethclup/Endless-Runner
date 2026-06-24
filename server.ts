@@ -50,12 +50,12 @@ async function startServer() {
           accepts: [
             {
               scheme: "exact",
-              price: "100000000000000", // 0.0001 ETH
+              price: "1000000000000", // 0.000001 ETH
               network: "eip155:8453",
               payTo: "0xe157F1F5e12adB38Ba013683E9Ce24efe21e5bA6", // Orchestrator wallet
             },
           ],
-          description: "Endless Runner MCP API",
+          description: "Endless Runner MCP AI Agent Tools",
           mimeType: "application/json",
           extensions: {
             [BUILDER_CODE]: declareBuilderCodeExtension("bc_1aw46v36"),
