@@ -14,30 +14,41 @@ const TOOLS = [
   { name: "get_track_info", description: "Retrieve procedural generation details for the current track.", inputSchema: { type: "object", properties: {} } }
 ];
 
-const resourceServer = new x402ResourceServer().register("eip155:84532", new ExactEvmScheme());
+const resourceServer = new x402ResourceServer();
+resourceServer.register("eip155:84532", new ExactEvmScheme());
 
-app.use(
-  paymentMiddleware(
-    {
-      "POST /api/mcp": {
-        accepts: [
-          {
-            scheme: "exact",
-            price: "1000000000000", // 0.000001 ETH
-            network: "eip155:84532",
-            payTo: "0xe157F1F5e12adB38Ba013683E9Ce24efe21e5bA6",
-          },
-        ],
-        description: "Endless Runner MCP AI Agent Tools",
-        mimeType: "application/json",
-        extensions: {
-          [BUILDER_CODE]: declareBuilderCodeExtension("bc_1aw46v36"),
+const x402Middleware = paymentMiddleware(
+  {
+    "POST /api/mcp": {
+      accepts: [
+        {
+          scheme: "exact",
+          price: "1000000000000", // 0.000001 ETH
+          network: "eip155:84532",
+          payTo: "0xe157F1F5e12adB38Ba013683E9Ce24efe21e5bA6",
         },
+      ],
+      description: "Endless Runner MCP AI Agent Tools",
+      mimeType: "application/json",
+      extensions: {
+        [BUILDER_CODE]: declareBuilderCodeExtension("bc_1aw46v36"),
       },
     },
-    resourceServer
-  )
+  },
+  resourceServer,
+  undefined,
+  undefined,
+  false // Disable syncFacilitatorOnStart to fix the Vercel 500 error!
 );
+
+app.use("/api/mcp", (req, res, next) => {
+  // Allow non-tool calls (like initialize) to pass without payment
+  if (req.method === "POST" && req.body && req.body.method && req.body.method !== "tools/call") {
+    return next();
+  }
+  // For tools/call, require payment
+  return x402Middleware(req, res, next);
+});
 
 app.get("/api/mcp", (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
