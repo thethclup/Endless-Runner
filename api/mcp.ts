@@ -14,7 +14,16 @@ const TOOLS = [
   { name: "get_track_info", description: "Retrieve procedural generation details for the current track.", inputSchema: { type: "object", properties: {} } }
 ];
 
-const resourceServer = new x402ResourceServer().register("eip155:84532", new ExactEvmScheme());
+const resourceServer = new x402ResourceServer()
+  .register("eip155:84532", new ExactEvmScheme())
+  .onProtectedRequest((context: any) => {
+    // We only want to require payment for actual tool calls, not MCP handshakes/initialization
+    const req = context.adapter.req;
+    if (req && req.body && req.body.method && req.body.method !== "tools/call") {
+      return { grantAccess: true };
+    }
+    return undefined;
+  });
 
 app.use(
   paymentMiddleware(

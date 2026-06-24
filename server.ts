@@ -21,7 +21,15 @@ async function startServer() {
   // Note: Changed from eip155:8453 to eip155:84532 because CDP facilitator currently
   // only supports 'exact' scheme for Base Sepolia (84532), not Base Mainnet (8453).
   // Using 8453 causes a 500 Internal Server Error when fetching facilitator options.
-  const resourceServer = new x402ResourceServer().register("eip155:84532", new ExactEvmScheme());
+  const resourceServer = new x402ResourceServer()
+    .register("eip155:84532", new ExactEvmScheme())
+    .onProtectedRequest((context: any) => {
+      const req = context.adapter.req;
+      if (req && req.body && req.body.method && req.body.method !== "tools/call") {
+        return { grantAccess: true };
+      }
+      return undefined;
+    });
 
   app.use(
     paymentMiddleware(
