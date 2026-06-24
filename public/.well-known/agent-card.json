@@ -49,12 +49,12 @@
     "competitive-orchestration",
     "ecosystem-coordination"
   ],
-  "supportedChains": ["eip155:8453"],
+  "supportedChains": ["eip155:84532"],
   "x402Support": true,
   "registrations": [
     {
       "agentId": null,
-      "agentRegistry": "eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432"
+      "agentRegistry": "eip155:84532:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432"
     }
   ],
   "supportedTrust": ["reputation"]

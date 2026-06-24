@@ -45,7 +45,7 @@ const TOOLS = [
   }
 ];
 
-const resourceServer = new x402ResourceServer().register("eip155:8453", new ExactEvmScheme());
+const resourceServer = new x402ResourceServer().register("eip155:84532", new ExactEvmScheme());
 
 app.use(
   paymentMiddleware(
@@ -55,7 +55,7 @@ app.use(
           {
             scheme: "exact",
             price: "1000000000000", // 0.000001 ETH
-            network: "eip155:8453",
+            network: "eip155:84532",
             payTo: "0xe157F1F5e12adB38Ba013683E9Ce24efe21e5bA6", // Orchestrator wallet
           },
         ],
