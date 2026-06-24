@@ -66,7 +66,10 @@ app.use(
         },
       },
     },
-    resourceServer
+    resourceServer,
+    undefined,
+    undefined,
+    false
   )
 );
 

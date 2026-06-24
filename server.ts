@@ -73,7 +73,10 @@ async function startServer() {
           },
         },
       },
-      resourceServer
+      resourceServer,
+      undefined,
+      undefined,
+      false
     )
   );
 
