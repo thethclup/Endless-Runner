@@ -4,6 +4,10 @@ import { injected, coinbaseWallet } from 'wagmi/connectors';
 import { Attribution } from 'ox/erc8021';
 import { BUILDER_CODE } from '../erc8021/constants';
 
+const DATA_SUFFIX = Attribution.toDataSuffix({
+  codes: [BUILDER_CODE],
+});
+
 export const wagmiConfig = createConfig({
   chains: [base, baseSepolia],
   connectors: [
@@ -14,4 +18,5 @@ export const wagmiConfig = createConfig({
     [base.id]: http('https://mainnet.base.org'),
     [baseSepolia.id]: http('https://sepolia.base.org'),
   },
+  dataSuffix: DATA_SUFFIX,
 });
