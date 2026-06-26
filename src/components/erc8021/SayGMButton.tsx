@@ -3,8 +3,6 @@ import { useAccount, useSwitchChain, useSendTransaction, useSendCalls, useConfig
 import { base } from 'wagmi/chains';
 import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle2, ExternalLink, X, Sun } from 'lucide-react';
-import { Attribution } from 'ox/erc8021';
-import { BUILDER_CODE } from '../../lib/erc8021/constants';
 import { getCallsStatus } from 'wagmi/actions';
 
 export function SayGMButton() {
@@ -27,13 +25,10 @@ export function SayGMButton() {
             const to = '0xcD0dd3716C5561De47a24949335dF8a8CD8F71a3' as `0x${string}`;
             const value = 0n; // 0 ETH self-transfer
             const data = '0x474d'; // "GM" in hex
-            const dataSuffix = Attribution.toDataSuffix({ appCode: BUILDER_CODE });
-            
             let hash: string = '';
             try {
                 const result = await sendCallsAsync({
-                    calls: [{ to, value, data }],
-                    capabilities: { dataSuffix: { value: dataSuffix, optional: true } } as any
+                    calls: [{ to, value, data }]
                 });
                 
                 while (true) {
@@ -50,7 +45,7 @@ export function SayGMButton() {
                 hash = await sendTransactionAsync({
                     to,
                     value,
-                    data: `${data}${dataSuffix.slice(2)}` as `0x${string}`
+                    data: data as `0x${string}`
                 });
             }
             

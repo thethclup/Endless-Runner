@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useAccount, useSwitchChain, useSendTransaction, useSendCalls } from 'wagmi';
 import { base } from 'wagmi/chains';
-import { Attribution } from 'ox/erc8021';
-import { BUILDER_CODE } from '../../lib/erc8021/constants';
 
 export function ERC8021Demo() {
     const { isConnected, address, chainId } = useAccount();
@@ -26,20 +24,18 @@ export function ERC8021Demo() {
             const to = address;
             const value = 0n;
             const data = '0x';
-            const dataSuffix = Attribution.toDataSuffix({ appCode: BUILDER_CODE });
             
             let tx: string = '';
             try {
                 const result = await sendCallsAsync({
-                    calls: [{ to, value, data }],
-                    capabilities: { dataSuffix: { value: dataSuffix, optional: true } } as any
+                    calls: [{ to, value, data }]
                 });
                 tx = result.id;
             } catch (err) {
                 tx = await sendTransactionAsync({
                     to,
                     value,
-                    data: `0x${dataSuffix.slice(2)}` as `0x${string}`
+                    data: data as `0x${string}`
                 });
             }
             if (tx) {

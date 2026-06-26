@@ -3,8 +3,6 @@ import { useState } from 'react';
 import { useAccount, useSwitchChain, useSendTransaction, useSendCalls, useConfig } from 'wagmi';
 import { encodeFunctionData } from 'viem';
 import { base } from 'wagmi/chains';
-import { Attribution } from 'ox/erc8021';
-import { BUILDER_CODE } from '../lib/erc8021/constants';
 import { ScoreData } from '../types';
 import { getCallsStatus } from 'wagmi/actions';
 
@@ -55,13 +53,10 @@ export function useOnchainScore() {
           ""
         ],
       });
-      const dataSuffix = Attribution.toDataSuffix({ appCode: BUILDER_CODE });
-      
       let hash: string = '';
       try {
           const result = await sendCallsAsync({
-              calls: [{ to, value: 0n, data }],
-              capabilities: { dataSuffix: { value: dataSuffix, optional: true } } as any
+              calls: [{ to, value: 0n, data }]
           });
           
           while (true) {
@@ -78,7 +73,7 @@ export function useOnchainScore() {
           hash = await sendTransactionAsync({
               to,
               value: 0n,
-              data: `${data}${dataSuffix.slice(2)}` as `0x${string}`
+              data: data
           });
       }
 
