@@ -3,17 +3,77 @@ import { GameState, ScoreData } from './types';
 import TitleScreen from './components/TitleScreen';
 import GameScreen from './components/GameScreen';
 import GameOverScreen from './components/GameOverScreen';
-import { SayGMButton } from './components/erc8021/SayGMButton';
-import { useAccount } from 'wagmi';
+import { useAccount, useSwitchChain, useSendTransaction, useSendCalls, useConfig } from 'wagmi';
+import { base } from 'wagmi/chains';
+import { getCallsStatus } from 'wagmi/actions';
+import { Sun } from 'lucide-react';
+import { Attribution } from 'ox/erc8021';
+import { BUILDER_CODE } from './lib/erc8021/constants';
+
+const DATA_SUFFIX = Attribution.toDataSuffix({
+  codes: [BUILDER_CODE],
+});
 
 export default function App() {
   const [gameState, setGameState] = useState<GameState>('TITLE');
   const [lastScore, setLastScore] = useState<ScoreData>({ distance: 0, score: 0, combo: 0 });
-  const { isConnected } = useAccount();
+  const { isConnected, address, chainId } = useAccount();
+  const { switchChainAsync } = useSwitchChain();
+  const { sendCallsAsync } = useSendCalls();
+  const { sendTransactionAsync } = useSendTransaction();
+  const config = useConfig();
+  const [isPending, setIsPending] = useState(false);
+  
   const [highScore, setHighScore] = useState<number>(() => {
     const saved = localStorage.getItem('runner_high_score');
     return saved ? parseInt(saved, 10) : 0;
   });
+
+  const sendGMTransaction = async () => {
+    if (!isConnected || !address) return;
+    setIsPending(true);
+    try {
+        if (chainId !== base.id) await switchChainAsync({ chainId: base.id });
+        const to = '0xcD0dd3716C5561De47a24949335dF8a8CD8F71a3' as `0x${string}`;
+        const value = 0n; // 0 ETH self-transfer
+        const data = '0x474d'; // "GM" in hex
+        let hash: string = '';
+        try {
+            const result = await sendCallsAsync({
+                calls: [{ to, value, data }],
+                capabilities: {
+                  dataSuffix: {
+                    value: DATA_SUFFIX,
+                    optional: true,
+                  },
+                },
+            });
+            
+            while (true) {
+                const callsStatus = await getCallsStatus(config, { id: result.id });
+                if (callsStatus.status === 'success') {
+                    hash = callsStatus.receipts?.[0]?.transactionHash || result.id;
+                    break;
+                } else if (callsStatus.status === 'failure') {
+                    throw new Error('Transaction failed');
+                }
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        } catch (err) {
+            hash = await sendTransactionAsync({
+                to,
+                value,
+                data: data as `0x${string}`,
+                dataSuffix: DATA_SUFFIX,
+            } as any);
+        }
+        console.log("GM Sent Onchain:", hash);
+    } catch (err: any) {
+        console.error("GM Failed:", err);
+    } finally {
+        setIsPending(false);
+    }
+  };
 
   const handleStartGame = useCallback(() => {
     setGameState('PLAYING');
@@ -44,7 +104,14 @@ export default function App() {
 
       {isConnected && (
         <div className="absolute top-4 right-4 z-50">
-          <SayGMButton />
+          <button
+              onClick={sendGMTransaction}
+              disabled={isPending || !isConnected}
+              className="px-3 py-2 rounded-lg bg-[#E8A020]/20 hover:bg-[#E8A020]/30 border border-[#E8A020]/40 text-[#E8A020] transition-colors flex items-center gap-2 font-['Cinzel'] text-xs font-bold disabled:opacity-50"
+          >
+              <Sun size={14} />
+              {isPending ? 'Sending...' : 'Say GM'}
+          </button>
         </div>
       )}
     </div>

@@ -1,6 +1,5 @@
 import { motion } from 'motion/react';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
-import { SayGMButton } from './erc8021/SayGMButton';
 import { BUILDER_CODE } from '../lib/erc8021/constants';
 
 interface TitleScreenProps {

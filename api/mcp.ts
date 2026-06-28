@@ -36,7 +36,10 @@ const x402Middleware = paymentMiddleware(
       accepts: [
         {
           scheme: "exact",
-          price: "1000000000000", // 0.000001 ETH
+          price: {
+            amount: "50000", // 0.05 USDC (6 decimals)
+            asset: "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
+          },
           network: "eip155:84532",
           payTo: "0xe157F1F5e12adB38Ba013683E9Ce24efe21e5bA6",
         },

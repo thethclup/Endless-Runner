@@ -13,6 +13,23 @@ console.error = (...args) => {
   originalConsoleError(...args);
 };
 
+const originalFetch = window.fetch;
+window.fetch = async (...args) => {
+  try {
+    return await originalFetch.apply(window, args);
+  } catch (err: any) {
+    const reqArg = args[0] as any;
+    const url = typeof reqArg === 'string' ? reqArg : (reqArg?.url || reqArg?.href || String(reqArg));
+    if (err.message && err.message.includes('Failed to fetch')) {
+      // Mock successful response for analytics
+      if (url.includes('coinbase') || url.includes('analytics')) {
+        return new Response('{}', { status: 200 });
+      }
+    }
+    throw err;
+  }
+};
+
 window.addEventListener('unhandledrejection', (event) => {
   const msg = event.reason?.message || String(event.reason);
   if (msg.includes('Analytics SDK') || msg.includes('Failed to fetch')) {
