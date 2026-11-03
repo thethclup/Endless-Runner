@@ -1,6 +1,11 @@
+import { useState } from 'react';
 import { motion } from 'motion/react';
-import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import { useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
 import { BUILDER_CODE } from '../lib/erc8021/constants';
+import { base, baseSepolia } from 'wagmi/chains';
+import { baseVibenet } from '../lib/denim/constants';
+import { Zap, ShieldCheck, Cpu } from 'lucide-react';
+import { DenimStatusModal } from './DenimStatusModal';
 
 interface TitleScreenProps {
   onStart: () => void;
@@ -8,31 +13,51 @@ interface TitleScreenProps {
 }
 
 export default function TitleScreen({ onStart, highScore }: TitleScreenProps) {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, chainId } = useAccount();
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
+  const { switchChainAsync } = useSwitchChain();
+  const [denimModalOpen, setDenimModalOpen] = useState(false);
 
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
       {/* Background neon elements */}
       <div className="absolute inset-0 overflow-hidden flex items-center justify-center pointer-events-none">
-        <div className="w-[120%] h-[120%] bg-[conic-gradient(from_90deg_at_50%_50%,#00000000_50%,#f472b640_100%)] animate-[spin_10s_linear_infinite] blur-3xl opacity-50" />
+        <div className="w-[120%] h-[120%] bg-[conic-gradient(from_90deg_at_50%_50%,#00000000_50%,#06b6d440_100%)] animate-[spin_10s_linear_infinite] blur-3xl opacity-50" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/20 rounded-full blur-[100px]" />
       </div>
 
       <div className="z-10 flex flex-col items-center max-w-lg w-full">
+        {/* Denim 200ms Native Block Badge */}
+        <motion.div
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="mb-4"
+        >
+          <button
+            onClick={() => setDenimModalOpen(true)}
+            className="flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/40 text-cyan-300 text-xs font-mono font-bold hover:bg-cyan-500/20 transition-all shadow-[0_0_15px_rgba(6,182,212,0.3)]"
+          >
+            <Zap size={13} className="text-cyan-400 animate-pulse" />
+            <span>BASE DENIM: 200ms CANONICAL BLOCKS</span>
+          </button>
+        </motion.div>
+
         <motion.div 
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-center mb-12 relative"
+          className="text-center mb-10 relative"
         >
           <h1 className="text-6xl md:text-8xl font-black italic tracking-tighter mb-2 leading-none">
             WARP
             <br />
             <span className="text-[#E8A020] [text-shadow:0_0_20px_#E8A020]">JUMPER</span>
           </h1>
-          <p className="mt-4 text-slate-400 uppercase tracking-[0.4em] text-xs md:text-sm">Base Mainnet Edition</p>
+          <p className="mt-4 text-cyan-400 font-mono font-bold uppercase tracking-[0.3em] text-xs md:text-sm">
+            Denim 200ms Edition
+          </p>
         </motion.div>
 
         <motion.button
@@ -59,25 +84,32 @@ export default function TitleScreen({ onStart, highScore }: TitleScreenProps) {
                 Connect Wallet (Base)
               </button>
             ) : (
-                <div className="w-full text-center space-y-3">
-                   <p className="text-xs text-slate-400 truncate w-full px-2">
-                       {address?.substring(0,6)}...{address?.substring(address.length - 4)}
-                   </p>
-                   <div className="flex gap-2 justify-center">
-                     <button onClick={() => disconnect()} className="flex-1 py-3 glass hover:bg-white/10 cyber-btn transition-colors text-[10px] sm:text-xs font-bold tracking-widest uppercase">
-                        Disconnect
-                     </button>
-                   </div>
+              <div className="w-full text-center space-y-3">
+                <div className="flex items-center justify-between px-2 text-xs">
+                  <span className="text-slate-400 truncate">
+                    {address?.substring(0,6)}...{address?.substring(address.length - 4)}
+                  </span>
+                  <span className="text-[10px] text-emerald-400 font-bold px-2 py-0.5 rounded bg-emerald-500/10">
+                    {chainId === baseVibenet.id ? 'Vibenet (200ms)' : chainId === baseSepolia.id ? 'Sepolia (Denim)' : 'Mainnet'}
+                  </span>
                 </div>
+                <div className="flex gap-2 justify-center">
+                  <button onClick={() => disconnect()} className="flex-1 py-2 glass hover:bg-white/10 cyber-btn transition-colors text-[10px] sm:text-xs font-bold tracking-widest uppercase text-slate-300">
+                    Disconnect
+                  </button>
+                </div>
+              </div>
             )}
           </div>
         </div>
       </div>
       
       <div className="absolute bottom-6 text-slate-500 font-mono text-[10px] tracking-widest pointer-events-none flex flex-col items-center gap-1">
-        <span>PROT: ERC-8021</span>
-        <span>ATTRIBUTION: {BUILDER_CODE} | BASE MAINNET</span>
+        <span className="text-cyan-400/80">DENIM 200ms NATIVE BLOCKS · FLASHBLOCKS RETIRED</span>
+        <span>ATTRIBUTION: {BUILDER_CODE} · BASE MAINNET & SEPOLIA</span>
       </div>
+
+      <DenimStatusModal isOpen={denimModalOpen} onClose={() => setDenimModalOpen(false)} />
     </div>
   );
 }
