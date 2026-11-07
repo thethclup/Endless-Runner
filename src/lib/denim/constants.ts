@@ -1,35 +1,43 @@
 // Base Denim Network Upgrade Constants & Specifications
 // Denim replaces Flashblocks with canonical 200ms native blocks (5 blocks per second).
+// Denim activated on Base Sepolia on October 21, 2026 at 18:00 UTC.
+// Denim activated on Base Mainnet on November 5, 2026 at 18:00 UTC.
 
 import { defineChain } from 'viem';
 
-export const DENIM_BLOCK_TIME_MS = 200; // 5 native blocks / second
+export const DENIM_BLOCK_TIME_MS = 200; // 5 native canonical blocks / second
 export const DENIM_CANONICAL_BLOCK_TAG = 'latest'; // 'pending' tag is removed after Denim
 
 export const DENIM_NETWORKS = {
-  vibenet: {
-    id: 84538453,
-    name: 'Base Vibenet',
-    status: 'LIVE (Developer Preview - 200ms Native Blocks)',
-    rpc: 'https://rpc.vibes.base.org',
-    explorer: 'https://explorer.vibes.base.org',
+  baseMainnet: {
+    id: 8453,
+    name: 'Base Mainnet',
+    status: 'ACTIVE ON MAINNET (Activated Nov 5, 2026 at 18:00 UTC · 200ms Blocks Live)',
+    rpc: 'https://mainnet.base.org',
+    explorer: 'https://basescan.org',
     native200msBlocks: true,
+    activationDate: 'November 5, 2026 at 18:00 UTC',
+    isPrimary: true,
   },
   baseSepolia: {
     id: 84532,
     name: 'Base Sepolia',
-    status: 'ACTIVE (Activated Oct 21, 2026 at 18:00 UTC - 200ms Native Blocks)',
+    status: 'ACTIVE (Activated Oct 21, 2026 at 18:00 UTC · 200ms Blocks Live)',
     rpc: 'https://sepolia.base.org',
     explorer: 'https://sepolia.basescan.org',
     native200msBlocks: true,
+    activationDate: 'October 21, 2026 at 18:00 UTC',
+    isPrimary: false,
   },
-  baseMainnet: {
-    id: 8453,
-    name: 'Base Mainnet',
-    status: 'ACTIVE / TARGETING NOV 2026 (200ms Native Blocks)',
-    rpc: 'https://mainnet.base.org',
-    explorer: 'https://basescan.org',
+  vibenet: {
+    id: 84538453,
+    name: 'Base Vibenet',
+    status: 'LIVE (Developer Preview · 200ms Native Blocks)',
+    rpc: 'https://rpc.vibes.base.org',
+    explorer: 'https://explorer.vibes.base.org',
     native200msBlocks: true,
+    activationDate: 'Experimental Preview',
+    isPrimary: false,
   },
 } as const;
 
@@ -52,8 +60,13 @@ export const baseVibenet = defineChain({
   testnet: true,
 });
 
-// Denim Migration Checklist & Documentation Reference
+// Denim Migration Checklist & Complete Documentation Reference
 export const DENIM_MIGRATION_MAPPINGS = [
+  {
+    legacy: 'wss://mainnet.flashblocks.base.org/ws',
+    denim: 'eth_subscribe("newHeads") or eth_subscribe("logs")',
+    note: 'Flashblocks WebSocket streams retired; use standard WebSocket RPC from Builder Stack',
+  },
   {
     legacy: 'eth_subscribe("newFlashblocks")',
     denim: 'eth_subscribe("newHeads")',
@@ -70,8 +83,8 @@ export const DENIM_MIGRATION_MAPPINGS = [
     note: 'Canonical block transactions per 200ms tick',
   },
   {
-    legacy: 'eth_getBlockByNumber("pending")',
-    denim: 'eth_getBlockByNumber("latest")',
+    legacy: 'eth_getBlockByNumber("pending", ...)',
+    denim: 'eth_getBlockByNumber("latest", ...)',
     note: 'Pending tag removed; queries read latest canonical 200ms block',
   },
   {
@@ -96,12 +109,37 @@ export const DENIM_MIGRATION_MAPPINGS = [
   },
   {
     legacy: 'eth_simulateV1(..., "pending")',
-    denim: 'eth_simulateV1(..., "latest")',
-    note: 'Simulation against canonical block state',
+    denim: 'eth_simulateV1 with canonical state',
+    note: 'Simulates directly against latest canonical state',
   },
   {
-    legacy: 'eth_getLogs(ending at "pending")',
+    legacy: 'base_transactionStatus',
+    denim: 'Canonical transaction receipts',
+    note: 'Method rejected on public endpoints; read canonical block receipts',
+  },
+  {
+    legacy: 'eth_getTransactionReceipt (preconfirmation)',
+    denim: 'Poll eth_getTransactionReceipt for 200ms canonical block',
+    note: 'Receipt available immediately once included in 200ms block; no preconfirmed state',
+  },
+  {
+    legacy: 'eth_getTransactionByHash (preconfirmation)',
+    denim: 'Canonical transaction data',
+    note: 'Block fields are set once transaction lands in canonical 200ms block',
+  },
+  {
+    legacy: 'eth_getLogs(range ending at "pending")',
     denim: 'eth_getLogs(canonical blocks only)',
     note: 'Query logs exclusively from canonical blocks',
+  },
+  {
+    legacy: 'Validity transaction with flashblock_index predicate',
+    denim: 'Bound with block_number only',
+    note: 'Base rejects flashblock_index predicates after Denim: blocks built every 200ms',
+  },
+  {
+    legacy: 'Historical block hashes (BLOCKHASH window)',
+    denim: 'Review history assumptions (covers 1/10th elapsed time)',
+    note: '256-block window keeps same entry count, but 200ms blocks mean 51.2s instead of 512s',
   },
 ] as const;

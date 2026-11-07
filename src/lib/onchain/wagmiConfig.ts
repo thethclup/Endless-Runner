@@ -13,23 +13,20 @@ const DATA_SUFFIX = Attribution.toDataSuffix({
 
 export const wagmiConfig = createConfig({
   chains: [base, baseSepolia, baseVibenet],
+  pollingInterval: DENIM_BLOCK_TIME_MS, // Wagmi polling interval for Denim 200ms blocks
   connectors: [
     injected(),
-    coinbaseWallet({ appName: 'Endless Runner Dash - Denim 200ms', preference: 'all' }),
+    coinbaseWallet({ appName: 'Endless Runner Dash - Base Mainnet Denim', preference: 'all' }),
   ],
   transports: {
-    // Denim: 200ms native blocks polling interval (5 blocks per second)
     [base.id]: http('https://mainnet.base.org', {
       batch: true,
-      pollingInterval: DENIM_BLOCK_TIME_MS,
     }),
     [baseSepolia.id]: http('https://sepolia.base.org', {
       batch: true,
-      pollingInterval: DENIM_BLOCK_TIME_MS,
     }),
     [baseVibenet.id]: http('https://rpc.vibes.base.org', {
       batch: true,
-      pollingInterval: DENIM_BLOCK_TIME_MS,
     }),
   },
   dataSuffix: DATA_SUFFIX,

@@ -4,7 +4,7 @@ import { useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
 import { BUILDER_CODE } from '../lib/erc8021/constants';
 import { base, baseSepolia } from 'wagmi/chains';
 import { baseVibenet } from '../lib/denim/constants';
-import { Zap, ShieldCheck, Cpu } from 'lucide-react';
+import { Zap, Sparkles, CheckCircle2 } from 'lucide-react';
 import { DenimStatusModal } from './DenimStatusModal';
 
 interface TitleScreenProps {
@@ -19,6 +19,8 @@ export default function TitleScreen({ onStart, highScore }: TitleScreenProps) {
   const { switchChainAsync } = useSwitchChain();
   const [denimModalOpen, setDenimModalOpen] = useState(false);
 
+  const isMainnet = chainId === base.id;
+
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
       {/* Background neon elements */}
@@ -28,7 +30,7 @@ export default function TitleScreen({ onStart, highScore }: TitleScreenProps) {
       </div>
 
       <div className="z-10 flex flex-col items-center max-w-lg w-full">
-        {/* Denim 200ms Native Block Badge */}
+        {/* Denim Mainnet Live Badge */}
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -37,10 +39,11 @@ export default function TitleScreen({ onStart, highScore }: TitleScreenProps) {
         >
           <button
             onClick={() => setDenimModalOpen(true)}
-            className="flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/40 text-cyan-300 text-xs font-mono font-bold hover:bg-cyan-500/20 transition-all shadow-[0_0_15px_rgba(6,182,212,0.3)]"
+            className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs font-mono font-bold hover:bg-emerald-500/25 transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)]"
           >
-            <Zap size={13} className="text-cyan-400 animate-pulse" />
-            <span>BASE DENIM: 200ms CANONICAL BLOCKS</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping mr-0.5" />
+            <Zap size={13} className="text-emerald-400" />
+            <span>BASE MAINNET DENIM: 200ms BLOCKS LIVE</span>
           </button>
         </motion.div>
 
@@ -48,15 +51,16 @@ export default function TitleScreen({ onStart, highScore }: TitleScreenProps) {
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-center mb-10 relative"
+          className="text-center mb-8 relative"
         >
           <h1 className="text-6xl md:text-8xl font-black italic tracking-tighter mb-2 leading-none">
             WARP
             <br />
             <span className="text-[#E8A020] [text-shadow:0_0_20px_#E8A020]">JUMPER</span>
           </h1>
-          <p className="mt-4 text-cyan-400 font-mono font-bold uppercase tracking-[0.3em] text-xs md:text-sm">
-            Denim 200ms Edition
+          <p className="mt-3 text-emerald-400 font-mono font-bold uppercase tracking-[0.25em] text-xs md:text-sm flex items-center justify-center gap-2">
+            <CheckCircle2 size={14} className="text-emerald-400" />
+            Base Mainnet Denim Edition
           </p>
         </motion.div>
 
@@ -81,7 +85,7 @@ export default function TitleScreen({ onStart, highScore }: TitleScreenProps) {
                 const injectedConnector = connectors.find(c => c.type === 'injected') ?? connectors[0];
                 connect({ connector: injectedConnector });
               }} className="w-full py-3 glass hover:bg-white/10 cyber-btn transition-colors text-sm font-bold tracking-widest uppercase">
-                Connect Wallet (Base)
+                Connect Wallet (Base Mainnet)
               </button>
             ) : (
               <div className="w-full text-center space-y-3">
@@ -89,11 +93,21 @@ export default function TitleScreen({ onStart, highScore }: TitleScreenProps) {
                   <span className="text-slate-400 truncate">
                     {address?.substring(0,6)}...{address?.substring(address.length - 4)}
                   </span>
-                  <span className="text-[10px] text-emerald-400 font-bold px-2 py-0.5 rounded bg-emerald-500/10">
-                    {chainId === baseVibenet.id ? 'Vibenet (200ms)' : chainId === baseSepolia.id ? 'Sepolia (Denim)' : 'Mainnet'}
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                    isMainnet ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-cyan-500/20 text-cyan-300'
+                  }`}>
+                    {chainId === base.id ? 'Mainnet (Denim)' : chainId === baseSepolia.id ? 'Sepolia (Denim)' : 'Vibenet (200ms)'}
                   </span>
                 </div>
                 <div className="flex gap-2 justify-center">
+                  {!isMainnet && (
+                    <button
+                      onClick={() => switchChainAsync({ chainId: base.id })}
+                      className="flex-1 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 text-[10px] font-bold tracking-widest uppercase"
+                    >
+                      To Mainnet
+                    </button>
+                  )}
                   <button onClick={() => disconnect()} className="flex-1 py-2 glass hover:bg-white/10 cyber-btn transition-colors text-[10px] sm:text-xs font-bold tracking-widest uppercase text-slate-300">
                     Disconnect
                   </button>
@@ -105,8 +119,8 @@ export default function TitleScreen({ onStart, highScore }: TitleScreenProps) {
       </div>
       
       <div className="absolute bottom-6 text-slate-500 font-mono text-[10px] tracking-widest pointer-events-none flex flex-col items-center gap-1">
-        <span className="text-cyan-400/80">DENIM 200ms NATIVE BLOCKS · FLASHBLOCKS RETIRED</span>
-        <span>ATTRIBUTION: {BUILDER_CODE} · BASE MAINNET & SEPOLIA</span>
+        <span className="text-emerald-400/90 font-bold">BASE MAINNET DENIM 200ms NATIVE BLOCKS · FLASHBLOCKS RETIRED</span>
+        <span>ATTRIBUTION: {BUILDER_CODE} · CANONICAL 200ms CADENCE</span>
       </div>
 
       <DenimStatusModal isOpen={denimModalOpen} onClose={() => setDenimModalOpen(false)} />

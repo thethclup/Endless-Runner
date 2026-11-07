@@ -34,7 +34,7 @@ export function ScoreSubmitButton({ scoreData }: ScoreSubmitButtonProps) {
     const getNetworkLabel = () => {
         if (chainId === baseVibenet.id) return 'Base Vibenet (Denim 200ms)';
         if (chainId === baseSepolia.id) return 'Base Sepolia (Denim Live)';
-        return 'Base Mainnet';
+        return 'Base Mainnet (Denim 200ms Live)';
     };
 
     return (
@@ -50,12 +50,12 @@ export function ScoreSubmitButton({ scoreData }: ScoreSubmitButtonProps) {
             >
                 <span className="relative z-10 flex items-center justify-center gap-2">
                     {!isConnected ? 'Wallet Not Connected' : 
-                     txHash ? '⚡ Secured on Denim Native Block!' : 
-                     isSubmitting ? 'Securing in 200ms...' : 
-                     'Record Score Onchain (Denim)'}
+                     txHash ? '⚡ Secured on Base Mainnet Denim!' : 
+                     isSubmitting ? 'Landing in 200ms on Mainnet...' : 
+                     'Record Score Onchain (Mainnet Denim)'}
                 </span>
                 {!txHash && isConnected && !isSubmitting && (
-                    <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-cyan-500/0 via-cyan-500/20 to-cyan-500/0 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
+                    <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-emerald-500/0 via-emerald-500/20 to-emerald-500/0 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
                 )}
             </button>
             {error && <p className="text-red-400 text-xs text-center mt-2">{error}</p>}
@@ -72,23 +72,23 @@ export function ScoreSubmitButton({ scoreData }: ScoreSubmitButtonProps) {
                             initial={{ scale: 0.9, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 20 }}
-                            className="glass p-8 max-w-md w-full relative flex flex-col items-center text-center overflow-hidden border border-cyan-500/30 shadow-[0_0_50px_rgba(6,182,212,0.3)]"
+                            className="glass p-8 max-w-md w-full relative flex flex-col items-center text-center overflow-hidden border border-emerald-500/40 shadow-[0_0_50px_rgba(16,185,129,0.3)]"
                         >
-                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-400 to-blue-500" />
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-cyan-500" />
                             
                             <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 text-slate-400 hover:text-white">
                                 <X size={20} />
                             </button>
 
-                            <div className="w-16 h-16 rounded-2xl bg-cyan-500/20 flex items-center justify-center mb-5 border border-cyan-500/40">
-                                <Zap className="text-cyan-400 w-9 h-9 animate-pulse" />
+                            <div className="w-16 h-16 rounded-2xl bg-emerald-500/20 flex items-center justify-center mb-5 border border-emerald-500/40">
+                                <Zap className="text-emerald-400 w-9 h-9 animate-pulse" />
                             </div>
 
                             <h2 className="text-2xl font-black italic text-white mb-1 uppercase tracking-tight">
-                                Score Confirmed in 200ms!
+                                Confirmed in 200ms! ⚡
                             </h2>
                             <p className="text-slate-400 text-xs mb-5">
-                                Included in a canonical Denim native block on <strong className="text-white">{getNetworkLabel()}</strong>.
+                                Included in a canonical Denim native block on <strong className="text-emerald-300">{getNetworkLabel()}</strong>.
                             </p>
                             
                             <div className="w-full bg-black/50 border border-white/10 rounded-xl p-4 mb-5 space-y-3 font-mono text-xs">
@@ -108,7 +108,7 @@ export function ScoreSubmitButton({ scoreData }: ScoreSubmitButtonProps) {
                                 </div>
                                 <div className="text-left pt-1">
                                     <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Transaction Hash</p>
-                                    <p className="text-[11px] text-cyan-300 break-all">{txHash}</p>
+                                    <p className="text-[11px] text-emerald-300 break-all">{txHash}</p>
                                 </div>
                             </div>
 
@@ -116,7 +116,7 @@ export function ScoreSubmitButton({ scoreData }: ScoreSubmitButtonProps) {
                                 href={getExplorerUrl(txHash)} 
                                 target="_blank" 
                                 rel="noreferrer"
-                                className="w-full py-3 bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 cyber-btn font-bold tracking-widest text-xs rounded-xl uppercase flex items-center justify-center gap-2 transition-colors font-mono"
+                                className="w-full py-3 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 cyber-btn font-bold tracking-widest text-xs rounded-xl uppercase flex items-center justify-center gap-2 transition-colors font-mono"
                             >
                                 View Canonical Block <ExternalLink size={15} />
                             </a>

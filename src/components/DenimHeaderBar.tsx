@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAccount, useSwitchChain } from 'wagmi';
 import { base, baseSepolia } from 'wagmi/chains';
 import { baseVibenet, DENIM_BLOCK_TIME_MS } from '../lib/denim/constants';
-import { Zap, Sun, Shield, Activity } from 'lucide-react';
+import { Zap, Sun, Shield, Activity, Globe } from 'lucide-react';
 import { DenimStatusModal } from './DenimStatusModal';
 
 interface DenimHeaderBarProps {
@@ -26,12 +26,7 @@ export function DenimHeaderBar({ onSendGM, isGMSending }: DenimHeaderBarProps) {
     return () => clearInterval(timer);
   }, []);
 
-  const getNetworkName = () => {
-    if (chainId === baseVibenet.id) return 'Vibenet (200ms)';
-    if (chainId === baseSepolia.id) return 'Base Sepolia (Denim)';
-    if (chainId === base.id) return 'Base Mainnet';
-    return 'Base Network';
-  };
+  const isMainnet = !chainId || chainId === base.id;
 
   return (
     <>
@@ -40,21 +35,21 @@ export function DenimHeaderBar({ onSendGM, isGMSending }: DenimHeaderBarProps) {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setModalOpen(true)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/60 hover:bg-black/80 border border-cyan-500/30 text-white backdrop-blur-md transition-all shadow-lg hover:border-cyan-400 group"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/60 hover:bg-black/80 border border-emerald-500/40 text-white backdrop-blur-md transition-all shadow-lg hover:border-emerald-400 group"
           >
             <div className="relative flex items-center justify-center">
               <span
                 className={`w-2.5 h-2.5 rounded-full transition-all duration-100 ${
-                  blockPulse ? 'bg-cyan-400 scale-125 shadow-[0_0_10px_#22d3ee]' : 'bg-cyan-600 scale-95'
+                  blockPulse ? 'bg-emerald-400 scale-125 shadow-[0_0_10px_#34d399]' : 'bg-emerald-600 scale-95'
                 }`}
               />
             </div>
-            <span className="text-[11px] font-mono font-bold tracking-wider text-cyan-300 uppercase flex items-center gap-1.5">
-              <Zap size={13} className="text-cyan-400 group-hover:rotate-12 transition-transform" />
-              Denim 200ms
+            <span className="text-[11px] font-mono font-bold tracking-wider text-emerald-300 uppercase flex items-center gap-1.5">
+              <Zap size={13} className="text-emerald-400 group-hover:rotate-12 transition-transform" />
+              Mainnet Denim
             </span>
-            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-200 border border-cyan-500/30">
-              5 blocks/s
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-200 border border-emerald-500/30">
+              200ms
             </span>
           </button>
         </div>
@@ -73,9 +68,9 @@ export function DenimHeaderBar({ onSendGM, isGMSending }: DenimHeaderBarProps) {
                     console.error('Network switch failed', err);
                   }
                 }}
-                className="bg-black/60 border border-white/10 text-slate-300 text-xs font-mono rounded-xl px-2.5 py-1.5 backdrop-blur-md focus:outline-none focus:border-cyan-500 cursor-pointer"
+                className="bg-black/60 border border-emerald-500/30 text-emerald-300 text-xs font-mono rounded-xl px-2.5 py-1.5 backdrop-blur-md focus:outline-none focus:border-emerald-500 cursor-pointer"
               >
-                <option value={base.id}>Base Mainnet</option>
+                <option value={base.id}>🟢 Base Mainnet (Denim Live)</option>
                 <option value={baseSepolia.id}>Base Sepolia (Denim Live)</option>
                 <option value={baseVibenet.id}>Base Vibenet (200ms Preview)</option>
               </select>
